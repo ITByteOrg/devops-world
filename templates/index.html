@@ -2,28 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bytes & Pipelines</title>
-    <script>
-        async function fetchISSLocation() {
-            try {
-                const response = await fetch('/iss-location'); // Call Flask API
-                const data = await response.json();
-                document.getElementById('iss-info').innerHTML = 
-                    `Latitude: ${data.iss_position.latitude}, Longitude: ${data.iss_position.longitude}`;
-            } catch (error) {
-                console.error("Error fetching ISS data:", error);
-                document.getElementById('iss-info').innerHTML = "Failed to load ISS location.";
-            }
-        }
-        
-        setInterval(fetchISSLocation, 5000); // Refresh every 5 seconds
-    </script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
     <h1>Bytes & Pipelines</h1>
-    <h2>Current ISS Location:</h2>
-    <div id="iss-info">Loading ISS data...</div>
+    <h2>Current ISS Location</h2>
+    <p>Latitude: <span id="latitude">Loading...</span></p>
+    <p>Longitude: <span id="longitude">Loading...</span></p>
+    <p>Altitude: <span id="altitude"></span></p>
+    <p>Velocity: <span id="velocity"></span></p>
+    <p>Visibility: <span id="visibility"></span></p> <!-- Daylight/Night info -->
+    <div id="map" style="height: 400px;"></div>
+    
+<script>
+    let map = L.map('map').setView([0, 0], 1); // Default center and zoom
+    
+    // Add tile layer (world map)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    
+    let issMarker = L.marker([0, 0]).addTo(map); // Placeholder marker
+    let issPath = JSON.parse(localStorage.getItem('issPath')) || []; // Load saved path
+    
+    async function fetchISSLocation() {
+        console.log("Fetching ISS location...");
+        try {
+            const response = await fetch('/iss-location'); // Make sure it's /iss-location, NOT /
+            const data = await response.json(); // Parse JSON
+            
+            // Save updated ISS path to localStorage
+            issPath.push([data.latitude, data.longitude]); // Store new position
+            localStorage.setItem('issPath', JSON.stringify(issPath)); // Save updated path
+            console.log("Updated ISS path:", issPath); // De
+
+            document.getElementById('latitude').textContent = data.latitude;
+            document.getElementById('longitude').textContent = data.longitude;
+            document.getElementById('altitude').textContent = `${data.altitude_mi} mi (${data.altitude_km} km)`;
+            document.getElementById('velocity').textContent = `${data.velocity_mph} mph (${data.velocity_kmh} km/h)`;
+            document.getElementById('visibility').textContent = data.visibility; // Show daylight/night status
+            
+            // Update map position & zoom level
+            issMarker.setLatLng([data.latitude, data.longitude]); 
+            
+            // Ensure the map adjusts to show the full ISS path
+            let bounds = L.latLngBounds(issPath);
+            map.fitBounds(bounds, { padding: [50, 50] })
+            map.setView([data.latitude - 42, data.longitude - 20], 2); // Shift map left manually
+            
+            // Draw path on the map
+            let polyline = L.polyline(issPath, { color: 'red' }).addTo(map);
+            
+        } catch (error) {
+            console.error('Error fetching ISS location:', error);
+        }
+    }
+
+    fetchISSLocation(); // Run when page loads    
+</script>
 </body>
 </html>
-
