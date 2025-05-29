@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytes & Pipelines</title>
+    <script>
+        async function fetchISSLocation() {
+            try {
+                const response = await fetch('/iss-location'); // Call Flask API
+                const data = await response.json();
+                document.getElementById('iss-info').innerHTML = 
+                    `Latitude: ${data.iss_position.latitude}, Longitude: ${data.iss_position.longitude}`;
+            } catch (error) {
+                console.error("Error fetching ISS data:", error);
+                document.getElementById('iss-info').innerHTML = "Failed to load ISS location.";
+            }
+        }
+        
+        setInterval(fetchISSLocation, 5000); // Refresh every 5 seconds
+    </script>
+</head>
+<body>
+    <h1>Bytes & Pipelines</h1>
+    <h2>Current ISS Location:</h2>
+    <div id="iss-info">Loading ISS data...</div>
+</body>
+</html>
+

@@ -1,6 +1,6 @@
 ### **DevOps World – README**  
 
-Welcome to **DevOps World**, a simple "Hello World" Python application designed to be tested and deployed through a complete **DevOps workflow**. This repository focuses on the application itself, including setup, dependencies, and basic usage.
+Welcome to **DevOps World**, a simple Python application designed to be tested and deployed through a complete **DevOps workflow**. This repository focuses on the application itself, including setup, dependencies, and basic usage.
 
 ---
 
@@ -19,21 +19,96 @@ For details on cloud deployment, CI/CD pipelines, security scanning, and monitor
 
 ### **Prerequisites**  
 Ensure you have the following installed:  
-- Python (latest version)  
+- IDE to work with latest version of Python (I used Anaconda but feel free to use any IDE)
 - pip (for dependency management)  
 - Git (to clone the repository)  
+- Flask for dynamic web pages
 
 ### **Installation**  
-Clone the repository and set up the environment:
+
+Clone the repository and move into the project directory
+
 ```bash
 git clone https://github.com/yourusername/devops-world.git
 cd devops-world
+```
+
+### **Install Python (If Not Installed)**
+
+Before proceeding, **ensure Python is installed**.
+### **Windows Users:**
+
+1. Download Python from the official site: Python.org
+    
+2. Run the installer and **check the box to add Python to PATH**.
+    
+3. Verify the installation with:
+    
+    powershell
+    
+    ```
+    python --version
+    ```
+    
+### **Mac/Linux Users (Optional, Not Tested)**
+
+Install Python via your package manager:
+
+bash
+
+```
+brew install python  # macOS
+sudo apt install python3  # Debian/Ubuntu
+```
+
+Check the installation with:
+
+bash
+
+```
+python3 --version
+```
+## **Set Up a Virtual Environment**
+
+Create and activate a virtual environment to isolate dependencies:
+
+### **Windows Users:**
+
+powershell
+
+```
+python -m venv venv
+venv\Scripts\activate
+```
+
+### **Mac/Linux Users (Optional, Not Tested)**
+
+bash
+
+```
+python -m venv venv
+source venv/bin/activate
+```
+
+✅ _You'll know it's activated when you see_ `(venv)` _in your terminal._
+
+## **Install Dependencies**
+
+bash
+
+```
 pip install -r requirements.txt
 ```
-Run the application:
-```bash
+
+## **Run the Application**
+
+bash
+
+```
 python app.py
 ```
+
+Now, open your browser and navigate to **http://127.0.0.1:5000/** to see the running app.
 
 ---
 
@@ -41,9 +116,11 @@ python app.py
 ```
 devops-world/
 │── app.py            # Main application script
-│── requirements.txt  # Python dependencies
+│── iss_service.py    # API call to location of ISS
+│── requirements.txt  # Dependencies
 │── README.md         # Project documentation
 │── .gitignore        # Git ignore rules
+│── /templates        # html pages
 ```
 
 ---
