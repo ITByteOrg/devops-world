@@ -11,15 +11,31 @@ load_dotenv(f".env.{ENV}")
 app = Flask(__name__)
 
 # Routes
-@app.route("/")
+@app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template("index.html")  # Serve HTML page
 
-@app.route("/iss-location")
+@app.route('/iss-location')
 def iss_location():
-    data = get_iss_location()
-    return jsonify(data)
+    iss_data = get_iss_location()
+ 
+    # Ensure latitude & longitude exist before using them
+    latitude = iss_data.get("latitude")
+    longitude = iss_data.get("longitude")
 
-if __name__ == "__main__":
+    # Convert units
+    altitude_miles = iss_data.get("altitude") * 0.621371  # Convert km to miles
+    velocity_mph = iss_data.get("velocity") * 0.621371  # Convert km/h to mph
+    
+    return jsonify({
+        "latitude": latitude,
+        "longitude": longitude,
+        "altitude_km": round(iss_data.get("altitude"),2),
+        "altitude_mi": round(altitude_miles, 2),  # Rounded for cleaner display
+        "velocity_kmh": round(iss_data.get("velocity"),2),
+        "velocity_mph": round(velocity_mph, 2),  # Rounded for cleaner display 
+        "visibility": iss_data.get("visibility")
+    })
+
+if __name__ == '__main__':
     app.run(debug=True)
-
