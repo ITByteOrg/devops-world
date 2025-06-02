@@ -1,6 +1,6 @@
+import os
 import requests
 import logging
-import os
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -17,7 +17,7 @@ logging.basicConfig(
 )
 
 def get_iss_location():
-    """Fetch the current location of the ISS with logging and error handling."""
+    # Fetch the current location of the ISS with logging and error handling.
     try:
         response = requests.get(ISS_API_URL, timeout=5)
         response.raise_for_status()
