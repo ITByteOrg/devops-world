@@ -2,5 +2,5 @@ flask # serving dynamic pages
 requests # HTTP calls to API
 pydantic # structured response
 gunicorn  # deploying with Nginx
-python-dotenv  # For managing API keys (if needed)
+python-dotenv  # For managing API keys
 loguru  # For better logging

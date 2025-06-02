@@ -19,10 +19,10 @@ For details on cloud deployment, CI/CD pipelines, security scanning, and monitor
 
 ### **Prerequisites**  
 Ensure you have the following installed:  
-- IDE to work with latest version of Python (I used Anaconda but feel free to use any IDE)
+- Visual Studio Code (or any IDE that supports the latest version of Python)
+- Python (latest version recommended)
 - pip (for dependency management)  
 - Git (to clone the repository)  
-- Flask for dynamic web pages
 
 ### **Installation**  
 
@@ -35,10 +35,9 @@ cd devops-world
 
 ### **Install Python (If Not Installed)**
 
-Before proceeding, **ensure Python is installed**.
 ### **Windows Users:**
 
-1. Download Python from the official site: Python.org
+1. Download Python from the official site: python.org
     
 2. Run the installer and **check the box to add Python to PATH**.
     
@@ -74,19 +73,16 @@ Create and activate a virtual environment to isolate dependencies:
 
 ### **Windows Users:**
 
-powershell
-
-```
+```powershell
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\activate
 ```
+> If `python` doesn't work, try `py -m venv venv`.
 
-### **Mac/Linux Users (Optional, Not Tested)**
+### **Mac/Linux Users:**
 
-bash
-
-```
-python -m venv venv
+```bash
+python3 -m venv venv
 source venv/bin/activate
 ```
 
@@ -94,34 +90,37 @@ source venv/bin/activate
 
 ## **Install Dependencies**
 
-bash
+Install all required Python packages using:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
+> **Note:** All required Python packages (including Flask) will be installed automatically from `requirements.txt`. You do not need to install them individually.
+
 ## **Run the Application**
 
-bash
+Start the Flask app with:
 
-```
+```bash
 python app.py
 ```
+> If `python` doesn't work, try `python3 app.py`.
 
 Now, open your browser and navigate to **http://127.0.0.1:5000/** to see the running app.
 
----
+To stop the server, press `Ctrl+C` in the terminal.
+
+_Tip: You can use the integrated terminal in Visual Studio Code for all commands above._
 
 ## **Repository Structure**  
-```
 devops-world/
-│── app.py            # Main application script
-│── iss_service.py    # API call to location of ISS
-│── requirements.txt  # Dependencies
-│── README.md         # Project documentation
-│── .gitignore        # Git ignore rules
-│── /templates        # html pages
-```
+│── app.py             # Main application script
+│── iss_service.py     # API call to location of ISS
+│── requirements.txt   # Dependencies
+│── README.md          # Project documentation
+│── .gitignore         # Git ignore rules
+│── templates/         # HTML pages
 
 ---
 
@@ -136,7 +135,7 @@ At this time, this repository is not open for external contributions. However, y
 
 ---
 
-## **Contact and Contributions**  
+## **Contact**
 For questions or suggestions, reach out via **GitHub Issues**.
 
 ---
