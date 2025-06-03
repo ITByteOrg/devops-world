@@ -26,3 +26,6 @@ gunicorn.pid
 
 # No environment files in GitHub
 .env*
+
+# Obsidian files
+.obsidian/
