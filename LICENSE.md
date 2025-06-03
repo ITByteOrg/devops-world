@@ -9,8 +9,8 @@ You are free to **share** (copy, distribute, and transmit) and **adapt** (remix,
 - **License details:** [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)  
 - **Modifications:** If modified, changes must be clearly stated.  
 
-## Contact Information
-For inquiries, please use: **182819753+ITByteEnthusiast@users.noreply.github.com**  
+## Contact 
+For questions or suggestions, reach out via [GitHub Issues](https://github.com/ITByteEnthusiast/devops-world/issues).
 
 ---
 
