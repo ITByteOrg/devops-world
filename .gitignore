@@ -1,14 +1,31 @@
-# Ignore Obsidian workspace settings
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-
-# Ignore plugin configurations (optional)
-.obsidian/plugins/
-
 # Ignore system-generated files
 .DS_Store
 .trash/
 
+# Virtual environment
+venv/
 
-/.obsidian/community-plugins.json
-TESTFile.md
+# Python cache files
+__pycache__/
+
+# Logs & Temporary files
+*.log
+*.cache
+
+# Environment variables / secrets
+.env
+
+# Compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Gunicorn socket & PID files (if used)
+gunicorn.sock
+gunicorn.pid
+
+# No environment files in GitHub
+.env*
+
+# Obsidian files
+.obsidian/
