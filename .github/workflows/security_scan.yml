@@ -1,0 +1,42 @@
+name: Security Scanning Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  secret_scanning:
+    name: Secret Scanning (TruffleHog)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@add-actions-cli-switch
+        with:
+          path: ./
+          base: "${{ github.event.repository.default_branch }}"
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  # Placeholder for future security tools
+  # static_analysis:
+  #   name: Static Analysis
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Run Semgrep
+  #       uses: returntocorp/semgrep-action@v1
+
+  # dependency_security:
+  #   name: Dependency Security
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Run Trivy
+  #       uses: aquasecurity/trivy-action@master

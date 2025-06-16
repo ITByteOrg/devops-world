@@ -105,19 +105,23 @@ _Tip: You can use the integrated terminal in Visual Studio Code for all commands
 ## Repository Structure
 ```
 devops-world/
-│── app.py             # Main application script
-│── iss_service.py     # API call to location of ISS
-│── requirements.txt   # Dependencies
-│── README.md          # Project documentation
-│── .gitignore         # Git ignore rules
-│── templates/         # HTML pages
+│── .github/
+│   └── workflows/
+│       └── security_scan.yml  # GitHub Actions workflow for security scanning
+│── requirements.txt    # Python dependencies
+│── README.md           # Project documentation
+│── .gitignore          # Git ignore rules
+│── src/                # Application source code
+│   ├── app.py          # Main application script
+│   └── iss_service.py  # API call to location of ISS
+│── config/             # Configuration files (YAML, etc.)
+│── templates/          # HTML templates for Flask
 ```
 
 ---
 ## Next Step
 
-Now that your application repository is set up, it's time to configure your CI/CD pipeline!  
-Head over to the [README](https://github.com/ITByteEnthusiast/devops-infra/blob/main/README.md) in the **devops-infra** repository for instructions on setting up GitHub Actions and managing your infrastructure.
+Now that your application repository is set up, it's time to review the overall security setup. Head over to the [README](https://github.com/ITByteEnthusiast/devops-security/blob/main/README.md) in the **devops-security** repository for an overview of key security practices used in this project. 
 
 ---
 ## License
