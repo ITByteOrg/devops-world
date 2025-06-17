@@ -1,0 +1,4 @@
+.git
+.git/logs
+venv
+__pycache__
