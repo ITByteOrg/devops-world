@@ -1,0 +1,3 @@
+TEST of TruffleHog stopping a secret
+
+GCP_SECRET_KEY=ABC123
