@@ -119,6 +119,7 @@ devops-world/
 │   └── iss_service.py  # API call to location of ISS
 │── config/             # Configuration files (YAML, etc.)
 │── templates/          # HTML templates for Flask
+│── Dockerfile          # docker build
 ```
 
 ---
