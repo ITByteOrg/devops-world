@@ -5,24 +5,25 @@ Welcome to **DevOps World**, a simple Python application designed to be tested a
 ---
 
 ## Overview
-This repository contains a simple Python application that will be integrated into a larger DevOps stack, but it **only includes the application itself**—not infrastructure, security, or monitoring configurations. Those components are managed separately in their respective repositories:
+This repository contains a simple Python application slightly more interesting than "Hello World". In this journey, I'm focusing on the DevOps stack. This repo is only for the application, as separate repos were set up for infrastructure, security, and monitoring configurations. As the project progresses, the repository links below will expand with details on cloud deployment, CI/CD pipelines, security scanning, and monitoring practices.
 
 - **DevOps Infrastructure:** [`devops-infra`](https://github.com/ITByteEnthusiast/devops-infra/blob/main/README.md)  
 - **DevOps Security:** [`devops-security`](https://github.com/ITByteEnthusiast/devops-security/blob/main/README.md)  
 - **DevOps Monitoring:** [`devops-monitoring`](https://github.com/ITByteEnthusiast/devops-monitoring/blob/main/README.md)  
-
-For details on cloud deployment, CI/CD pipelines, security scanning, and monitoring setup, refer to the above repositories.
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-Ensure you have the following installed:  
+You’ll want a dependable tool for editing and managing your files — modern IDEs make that process much more efficient. While it's technically possible to build everything using something like Notepad, modern IDEs offer far more—integrated debugging, IntelliSense, and a smoother development experience overall. There are excellent open-source options, so explore a few and choose one that suits your workflow.
+
+Here's what I used
 - Visual Studio Code (or any IDE that supports the latest version of Python)
 - Python (latest version recommended)
 - pip (for dependency management)  
-- Git (to clone the repository)  
+- Git (to clone the repository)
+- Obsidian - started using this for markdown editing, but decided VS Code is enough for my needs and fits my workflow better.    
 
 ### Installation
 
@@ -91,11 +92,11 @@ pip install -r requirements.txt
 Start the Flask app with:
 
 ```bash
-python app.py
+python src/app.py
 ```
 > If `python` doesn't work, try `python3 app.py`.
 
-Now, open your browser and navigate to **http://127.0.0.1:5000/** to see the running app.
+In your browser, navigate to **http://127.0.0.1:5000/** to see the running app.
 
 To stop the server, press `Ctrl+C` in the terminal.
 
@@ -103,6 +104,9 @@ _Tip: You can use the integrated terminal in Visual Studio Code for all commands
 
 ---
 ## Repository Structure
+
+This section provides a high-level view of the application directory structure. As the CI/CD stack takes shape, I anticipate breaking out iss_service.py into a dedicated microservice for improved modularity. Initially, src/ and templates/ were placed at the top level. But as the project matured, I moved templates/ under src/ to better align with Flask’s organizational conventions and keep app-specific logic and views together. (And yes—templates/index.html will be removed soon... possibly before anyone reads this.)
+
 ```
 devops-world/
 │── .github/
@@ -125,7 +129,7 @@ devops-world/
 ---
 ## Next Step
 
-Now that your application repository is set up, it's time to review the overall security setup. Head over to the [README](https://github.com/ITByteEnthusiast/devops-security/blob/main/README.md) in the **devops-security** repository for an overview of key security practices used in this project. 
+After setting up the repositories and scaffolding the application, I focused on establishing a strong CI/CD framework. Although the order suited this exploratory build, I’d reverse it in a production context—starting with a robust CI/CD pipeline. Laying that foundation early promotes good engineering hygiene—enforcing automated scans, pull request gates, and approval workflows before anything lands in main. As I continue to build out the project, I will likely reorder these pages, but for now, the journey continues. My next stop in the journey was devops-infra for the Terraform setup. 
 
 ---
 ## License
@@ -134,7 +138,7 @@ This project is licensed under **Creative Commons Attribution 4.0 International 
 
 ---
 ## Contributions
-At this time, this repository is not open for external contributions. However, you are welcome to explore the content, learn from it, and use it within the terms of the **CC-BY-4.0** license. Thank you for your interest!
+While this repository isn’t open for external contributions, you’re welcome to explore the content, learn from it, and reuse what’s helpful under the terms of the CC-BY-4.0 license. Thank you for your interest!
 
 ---
 ## Contact 
