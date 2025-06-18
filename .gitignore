@@ -1,6 +1,6 @@
 # Ignore system-generated files
-.DS_Store
 .trash/
+.DS_Store
 
 # Virtual environment
 venv/
