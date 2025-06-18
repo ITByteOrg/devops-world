@@ -64,7 +64,12 @@
         try {
             const response = await fetch('/iss-location'); // Make sure it's /iss-location, NOT /
             const data = await response.json(); // Parse JSON
+            console.log("✅ Data received:", data);
             
+            if (!data.latitude || !data.longitude) {
+                console.warn("⚠️ No valid coordinates in data:", data);
+            }
+
             // push path to array, trim and save array 
             issPath.push([data.latitude, data.longitude]); // Add new position to array
             if (issPath.length > 20) { issPath = issPath.slice(-20); }
@@ -82,8 +87,11 @@
             
             // Update marker, bounds of map, and fit the bounds on the screen
             issMarker.setLatLng([data.latitude, data.longitude], { pan: false });
-            let bounds = L.latLngBounds(issPath);
-            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 2 });
+
+            if (issPath.length > 0) {
+                let bounds = L.latLngBounds(issPath);
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 2 });
+            }
 
         } catch (error) {
             console.error('Error fetching ISS location:', error);
