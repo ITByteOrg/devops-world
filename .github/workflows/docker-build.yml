@@ -4,6 +4,9 @@ name: Dev Docker Build
 on:
   push:
     branches: [ dev ]
+    tags:
+      - 'v*.*.*'
+      - 'v*.*.*-*'  # for prerelease tags like v0.1.0-dev
 
 jobs:
   docker-lint-and-build:
