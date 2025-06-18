@@ -108,6 +108,7 @@ devops-world/
 │── .github/
 │   └── workflows/
 │       └── security_scan.yml  # GitHub Actions workflow for security scanning
+│       └── ci-dev.yml  # GitHub Actions workflow for ci
 │── requirements.txt    # Python dependencies
 │── README.md           # Project documentation
 │── .gitignore          # Git ignore rules
@@ -116,6 +117,7 @@ devops-world/
 │   └── iss_service.py  # API call to location of ISS
 │── config/             # Configuration files (YAML, etc.)
 │── templates/          # HTML templates for Flask
+│── Dockerfile          # docker build
 ```
 
 ---
