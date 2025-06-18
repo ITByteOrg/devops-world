@@ -4,6 +4,10 @@ from flask import Flask, render_template, jsonify
 from dotenv import load_dotenv
 from iss_service import get_iss_location  
 
+LOG_DIR = "logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+
 # Load environment variables - defaults to dev
 ENV = os.getenv("FLASK_ENV", "dev")
 load_dotenv(f".env.{ENV}")
