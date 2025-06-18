@@ -44,8 +44,8 @@
         }
     
         // Initialize map with restored settings
-        let map = L.map("map").setView([0,0],0);
-   
+        map.setView([0, 0], 0);  // Don't redeclare—just use the global map
+
 
         // Set up ISS path bounds and fit the full path on map
         if (issPath.length > 0 && issPath.every(coord => Array.isArray(coord) && coord.length === 2)) {
