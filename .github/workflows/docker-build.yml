@@ -3,10 +3,17 @@ name: Dev Docker Build
 
 on:
   push:
-    branches: [ dev ]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]  # excludes 'closed' events
+
 
 jobs:
   docker-lint-and-build:
+    if: github.event_name != 'push' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +34,4 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t devops-world:dev .
+

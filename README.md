@@ -108,10 +108,12 @@ devops-world/
 │── .github/
 │   └── workflows/
 │       └── security_scan.yml  # GitHub Actions workflow for security scanning
-│       └── ci-dev.yml  # GitHub Actions workflow for ci
+│       └── docker-build.yml   
+│       └── ci-dev.yml
 │── requirements.txt    # Python dependencies
 │── README.md           # Project documentation
 │── .gitignore          # Git ignore rules
+│── .trufflehogignore   # Trufflehog ignore rules
 │── src/                # Application source code
 │   ├── app.py          # Main application script
 │   └── iss_service.py  # API call to location of ISS
