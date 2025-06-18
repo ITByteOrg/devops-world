@@ -29,3 +29,6 @@ gunicorn.pid
 
 # Obsidian files
 .obsidian/
+
+# Optional TruffleHog logs in repo root
+.trufflehog-logs/
