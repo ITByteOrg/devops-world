@@ -32,3 +32,6 @@ gunicorn.pid
 
 # Optional TruffleHog logs in repo root
 .trufflehog-logs/
+
+# no program like trufflehog etc
+*.exe
