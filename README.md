@@ -136,12 +136,11 @@ After setting up the repositories and scaffolding the application, I focused on 
 This project is licensed under **Creative Commons Attribution 4.0 International License (CC-BY-4.0).**  
 🔗 **Full license details:** [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)
 
----
-## Contributions
-While this repository isn’t open for external contributions, you’re welcome to explore the content, learn from it, and reuse what’s helpful under the terms of the CC-BY-4.0 license. Thank you for your interest!
+## Contributing
 
----
-## Contact 
-For questions or suggestions, reach out via [GitHub Issues](https://github.com/ITByteEnthusiast/devops-world/issues).
+While this project is publicly available under an open license, contributions are currently not being accepted.
 
+You're welcome to use, fork, or adapt the scripts for your infrastructure work. If you find them helpful, a star or mention is always appreciated.
 
+## Maintainer
+Developed and maintained by ITByteEnthusiast.
