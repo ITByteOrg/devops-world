@@ -121,6 +121,10 @@ devops-world/
 │── templates/          # HTML templates for Flask
 │── Dockerfile          # docker build
 ```
+---
+## Debug Utilities
+Manual GitHub Actions for branch logic + context inspection  
+→ [See debug workflows](.github/workflows/README.md)
 
 ---
 ## Next Step

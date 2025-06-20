@@ -1,0 +1,25 @@
+name: 🛠 GitHub Actions Context Dump
+
+on:
+  workflow_dispatch:
+
+jobs:
+  env-dump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Print Environment Variables
+        run: env
+
+      - name: Dump GitHub Context Object
+        run: |
+          echo "== github context =="
+          echo '${{ toJson(github) }}'
+
+      - name: Dump Event Payload (as JSON)
+        run: |
+          mkdir -p debug
+          echo '${{ toJson(github.event) }}' > debug/event.json
+          echo "Saved event payload to debug/event.json"
