@@ -16,6 +16,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+
 def get_iss_location():
     # Fetch the current location of the ISS with logging and error handling.
     try:
@@ -23,7 +24,9 @@ def get_iss_location():
         response.raise_for_status()
         data = response.json()
 
-        logging.info(f"ISS Location: {data['latitude']}, {data['longitude']}")  # Log coordinates
+        logging.info(
+            f"ISS Location: {data['latitude']}, {data['longitude']}"
+        )  # Log coordinates
         return data
 
     except requests.exceptions.Timeout:
@@ -33,4 +36,3 @@ def get_iss_location():
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to fetch ISS data: {e}")
         return {"error": "Failed to fetch ISS data", "details": str(e)}
-
