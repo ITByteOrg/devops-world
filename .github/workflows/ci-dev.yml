@@ -37,7 +37,7 @@ jobs:
 
       - name: Lint code
         # Only lint existing folders
-        run: flake8 $(find src config tests -type d -maxdepth 0 2>/dev/null)
+        run: flake8 --config=.flake8 $(find src config tests -type d -maxdepth 0 2>/dev/null)
 
       - name: Security scan (Bandit)
         run: bandit -r src 
