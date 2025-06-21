@@ -1,12 +1,23 @@
-# .github/workflows/ci-dev.yml
-name: Dev Branch CI
+# ────────────────────────────────────────────────
+# Workflow: Dev CI
+# Purpose : Lint and test Python code on dev branches and PRs
+# Trigger : push to dev branches, pull_request to main
+# ────────────────────────────────────────────────
+name: Dev CI
 
 on:
   push:
-    branches: [ dev ]
+    branches: 
+      - feature
+      - feature/*
+      - hotfix/*
+      - release/*
+  pull_request:
+    branches: 
+      - main
 
 jobs:
-  build-and-test:
+  build-test:
     runs-on: ubuntu-latest
 
     steps:

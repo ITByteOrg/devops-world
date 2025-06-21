@@ -1,13 +1,16 @@
 # ────────────────────────────────────────────────
-# Workflow: PR Validation
-# Purpose : Lint and build Dockerfile in pull requests
-# Trigger : pull_request targeting main
+# Workflow: Docker Dev Quality Gate
+# Purpose : Lint and build Docker image on dev branches
+# Trigger : push to feature/*, hotfix/*, release/*
 # ────────────────────────────────────────────────
-name: PR Validation
+name: Docker Dev
 
 on:
-  pull_request:
-    branches: [ main ]
+  push:
+    branches:
+      - feature/*
+      - hotfix/*
+      - release/*
 
 jobs:
   lint-and-build:
@@ -16,12 +19,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Lint Dockerfile with Hadolint (containerized)
+      - name: Lint Dockerfile with Hadolint
         uses: hadolint/hadolint-action@v2.0.0
         with:
           dockerfile: Dockerfile
 
-      - name: Build Docker image with PR tag
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (no push)
         run: |
-          echo "Triggered by PR #${{ github.event.pull_request.number }}"
-          docker build -t devops-world:pr-${{ github.event.pull_request.number }} .
+          echo "Triggered by ref: ${{ github.ref }}"
+          docker build -t devops-world:dev-${{ github.sha }} .

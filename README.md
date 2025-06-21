@@ -125,6 +125,44 @@ devops-world/
 │── templates/          # HTML templates for Flask
 │── Dockerfile          # docker build
 ```
+
+---
+## CI/CD Workflows Overview
+
+This project uses a modular GitHub Actions setup to enforce code quality, validate infrastructure, and streamline delivery across environments. Each `.yml` workflow is purpose-built for clarity and separation of concerns:
+
+<details>
+<summary><strong>ci-dev.yml</strong> — Python Dev Validation</summary>
+
+Validates Python code on development branches and pull requests. Runs:
+- Linting with Flake8
+- Security scans with Bandit
+- Tests via Pytest
+- Secret scanning using TruffleHog
+
+</details>
+
+<details>
+<summary><strong>docker-dev.yml</strong> — Docker Quality Gate</summary>
+
+Lint-checks and builds Docker images on dev-style branches (`feature/*`, `hotfix/*`, `release/*`) without pushing. Keeps Dockerfiles validated early in the cycle.
+
+</details>
+
+<details>
+<summary><strong>pr-validation.yml</strong> — Pull Request Docker Checks</summary>
+
+Lint-checks and builds Docker images for all PRs targeting `main`. Uses Hadolint and build testing for early-stage validation.
+
+</details>
+
+<details>
+<summary><strong>docker-release.yml</strong> — Production Push</summary>
+
+Builds and pushes Docker images to DockerHub from `main` and `release/*` branches. Includes tagging, login, and secure push pipelines.
+
+</details>
+
 ---
 ## Debug Utilities
 Manual GitHub Actions for branch logic + context inspection  
