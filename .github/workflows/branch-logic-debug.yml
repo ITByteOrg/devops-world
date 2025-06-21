@@ -1,0 +1,23 @@
+name: 🔍 Branch Matching Debugger
+
+on:
+  workflow_dispatch:
+
+jobs:
+  branch-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Evaluate Branch Matching
+        run: |
+          echo "Full ref: ${GITHUB_REF}"
+          echo "Branch name: ${GITHUB_REF#refs/heads/}"
+
+          echo ""
+          echo "⏵ Matches flat 'feature'? → $([[ '${GITHUB_REF}' == 'refs/heads/feature' ]] && echo YES || echo no)"
+          echo "⏵ Matches wildcard 'feature/*'? → $(echo '${GITHUB_REF}' | grep -q '^refs/heads/feature/' && echo YES || echo no)"
+          echo "⏵ Matches fix/*? → $(echo '${GITHUB_REF}' | grep -q '^refs/heads/fix/' && echo YES || echo no)"
+          echo "⏵ Matches hotfix/*? → $(echo '${GITHUB_REF}' | grep -q '^refs/heads/hotfix/' && echo YES || echo no)"
+          echo "⏵ Matches docs/*? → $(echo '${GITHUB_REF}' | grep -q '^refs/heads/docs/' && echo YES || echo no)"
