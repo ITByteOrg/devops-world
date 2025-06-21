@@ -13,3 +13,6 @@ jobs:
 
       - name: Lint Dockerfile with Hadolint (Docker)
         run: cat Dockerfile | docker run --rm -i hadolint/hadolint
+
+# trigger pr-validation.yml on pull requests to main branch
+ 
