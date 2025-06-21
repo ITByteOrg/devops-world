@@ -36,10 +36,11 @@ jobs:
           pip install flake8 bandit pytest
 
       - name: Lint code
-        run: flake8 src scripts config tests
+        # Only lint existing folders
+        run: flake8 $(find src config tests -type d -maxdepth 0 2>/dev/null)
 
       - name: Security scan (Bandit)
-        run: bandit -r src scripts
+        run: bandit -r src 
 
       - name: Run tests
         run: pytest --tb=short --disable-warnings
