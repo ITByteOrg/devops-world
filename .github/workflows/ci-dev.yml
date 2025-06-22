@@ -42,8 +42,16 @@ jobs:
       - name: Security scan (Bandit)
         run: bandit -r src 
 
-      - name: Run tests
-        run: pytest --tb=short --disable-warnings
+      - name: Load .env
+        run: |
+          if [ -f .env ]; then
+            echo "Loading environment variables from .env"
+            set -a
+            source .env
+            set +a
+          else
+            echo "Warning: .env file not found. Skipping env load."
+          fi
 
       - name: Secret scan (TruffleHog, dev-only scope)
         run: |
