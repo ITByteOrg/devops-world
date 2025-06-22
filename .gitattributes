@@ -1,0 +1,17 @@
+# Always use LF for shell scripts (bash-friendly)
+bin/* text eol=lf
+
+# Python code — normalize to system default (CRLF on Windows, LF on macOS/Linux)
+*.py text
+
+# GitHub Actions workflows — always LF (YAML is sensitive to extra carriage returns)
+.github/**/*.yml text eol=lf
+
+# Markdown and documentation — LF for consistency
+*.md text eol=lf
+*.txt text eol=lf
+
+# JSON and TOML configs — keep LF to avoid parsing issues
+*.json text eol=lf
+*.toml text eol=lf
+
