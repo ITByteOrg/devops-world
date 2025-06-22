@@ -1,7 +1,9 @@
-import os
 import logging
-from flask import Flask, render_template, jsonify
+import os
+
 from dotenv import load_dotenv
+from flask import Flask, jsonify, render_template
+
 from iss_service import get_iss_location
 
 LOG_DIR = "logs"
@@ -82,6 +84,5 @@ if __name__ == "__main__":
     app.run(
         host=os.getenv("FLASK_HOST", "127.0.0.1"),
         port=5000,
-
-        debug=os.getenv("FLASK_DEBUG", "false").lower() == "true"
+        debug=os.getenv("FLASK_DEBUG", "false").lower() == "true",
     )

@@ -1,7 +1,9 @@
 # tests/test_iss_location.py
-import sys
 import os
+import sys
+
 import pytest
+
 from src.app import app
 
 # Ensure the src directory is in the path for imports
@@ -20,7 +22,7 @@ def test_iss_location_success(client, monkeypatch):
         "longitude": 20.0,
         "altitude": 420.0,  # km
         "velocity": 27600.0,  # km/h
-        "visibility": "daylight"
+        "visibility": "daylight",
     }
 
     # Patch get_iss_location to return mock data

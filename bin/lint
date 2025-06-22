@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-source venv/Scripts/activate || {
-  echo "ERROR: Could not activate venv"
-  exit 1
-}
+VENV_PY="venv/Scripts/python.exe"
 
-echo "Running flake8 linter..."
-flake8 src tests
+if [ ! -x "$VENV_PY" ]; then
+  echo "❌ ERROR: Could not find venv Python at $VENV_PY"
+  exit 1
+fi
+
+echo "🔍 Running flake8 via venv..."
+"$VENV_PY" -m flake8 src tests

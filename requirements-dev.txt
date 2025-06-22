@@ -15,4 +15,3 @@ isort             # Sorts and organizes imports automatically
 httpx             # HTTP client for async/sync API testing
 mypy              # Static type checker for Python
 dotenv-linter     # Validates .env files for bad syntax or duplicates
-

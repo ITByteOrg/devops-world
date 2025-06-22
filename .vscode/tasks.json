@@ -9,6 +9,12 @@
       "group": "build",
       "presentation": {
         "reveal": "always"
+      },
+      "options": {
+        "env": {
+          "GIT_SSH_COMMAND": "ssh -o BatchMode=yes",
+          "GIT_ASKPASS": "echo"
+        }
       }
     },
     {
@@ -19,6 +25,12 @@
       "group": "test",
       "presentation": {
         "reveal": "silent"
+      },
+      "options": {
+        "env": {
+          "GIT_SSH_COMMAND": "ssh -o BatchMode=yes",
+          "GIT_ASKPASS": "echo"
+        }
       }
     },
     {
@@ -29,6 +41,12 @@
       "group": "test",
       "presentation": {
         "reveal": "always"
+      },
+      "options": {
+        "env": {
+          "GIT_SSH_COMMAND": "ssh -o BatchMode=yes",
+          "GIT_ASKPASS": "echo"
+        }
       }
     }
   ]

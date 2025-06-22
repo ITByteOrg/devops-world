@@ -1,6 +1,7 @@
-import os
-import requests
 import logging
+import os
+
+import requests
 from dotenv import load_dotenv
 
 # Load environment variables
