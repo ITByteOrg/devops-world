@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Check (tests, lint, security)",
+      "type": "shell",
+      "command": "./bin/check",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always"
+      },
+      "options": {
+        "env": {
+          "GIT_SSH_COMMAND": "ssh -o BatchMode=yes",
+          "GIT_ASKPASS": "echo"
+        }
+      }
+    },
+    {
+      "label": "Lint",
+      "type": "shell",
+      "command": "./bin/lint",
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "options": {
+        "env": {
+          "GIT_SSH_COMMAND": "ssh -o BatchMode=yes",
+          "GIT_ASKPASS": "echo"
+        }
+      }
+    },
+    {
+      "label": "Dev (pytest only)",
+      "type": "shell",
+      "command": "./bin/dev",
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "reveal": "always"
+      },
+      "options": {
+        "env": {
+          "GIT_SSH_COMMAND": "ssh -o BatchMode=yes",
+          "GIT_ASKPASS": "echo"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# Load environment variables
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+else
+  echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
+fi
+
+
+source venv/Scripts/activate || {
+  echo "✘ ERROR: Could not activate venv"
+  exit 1
+}
+
+export PYTHONPATH=src
+
+echo "🔎 Running full quality checks..."
+
+flake8_ok=1
+bandit_ok=1
+pytest_ok=1
+
+echo "🧹 flake8:"
+flake8 src tests && flake8_ok=0
+
+echo "🛡️ bandit:"
+bandit -r src && bandit_ok=0
+
+echo "🧪 pytest:"
+pytest "$@" && pytest_ok=0
+
+echo
+
+if [[ $flake8_ok -eq 0 && $bandit_ok -eq 0 && $pytest_ok -eq 0 ]]; then
+  echo "✅ All checks passed: flake8, bandit, pytest"
+else
+  echo "❌ One or more checks failed:"
+  [[ $flake8_ok -ne 0 ]] && echo "  - flake8"
+  [[ $bandit_ok -ne 0 ]] && echo "  - bandit"
+  [[ $pytest_ok -ne 0 ]] && echo "  - pytest"
+  exit 1
+fi
+

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Load environment variables
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+else
+  echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
+fi
+
+
+# Ensure venv is activated
+source venv/Scripts/activate || {
+  echo "❌ ERROR: Could not activate virtual environment."
+  echo "💡 Hint: Did you create it with: py -m venv venv ?"
+  exit 1
+}
+
+# Set up PYTHONPATH and run tests
+export PYTHONPATH=src
+
+echo "🧪 Environment activated. Running tests..."
+pytest "$@"

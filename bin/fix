@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Load environment variables
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+else
+  echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
+fi
+
+
+source venv/Scripts/activate || {
+  echo "❌ ERROR: Could not activate virtual environment."
+  exit 1
+}
+
+export PYTHONPATH=src
+
+echo "🔧 Applying fixes..."
+
+echo "↪️ Sorting imports with isort..."
+isort src tests
+
+echo "🎨 Formatting code with black..."
+black src tests
+
+echo "🧹 Re-running flake8 to check cleanliness..."
+flake8 src tests || {
+  echo "❌ Lint check failed after fixes."
+  exit 1
+}
+
+echo "✅ Code formatted and lint passed."

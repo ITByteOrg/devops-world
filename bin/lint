@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Load environment variables
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+else
+  echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
+fi
+
+
+VENV_PY="venv/Scripts/python.exe"
+
+if [ ! -x "$VENV_PY" ]; then
+  echo "❌ ERROR: Could not find venv Python at $VENV_PY"
+  exit 1
+fi
+
+echo "🔍 Running flake8 via venv..."
+"$VENV_PY" -m flake8 src tests
