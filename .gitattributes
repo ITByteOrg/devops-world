@@ -1,17 +1,26 @@
-# Always use LF for shell scripts (bash-friendly)
+# Shell scripts: always use LF (for bash compatibility on all platforms)
 bin/* text eol=lf
 
-# Python code — normalize to system default (CRLF on Windows, LF on macOS/Linux)
-*.py text
+# Python source files: normalized line endings
+*.py text eol=lf
 
-# GitHub Actions workflows — always LF (YAML is sensitive to extra carriage returns)
+# VS Code configurations and tasks
+.vscode/* text eol=lf
+
+# GitHub Actions workflows: avoid CRLF parsing issues
 .github/**/*.yml text eol=lf
 
-# Markdown and documentation — LF for consistency
+# Markdown and plaintext documentation
 *.md text eol=lf
 *.txt text eol=lf
 
-# JSON and TOML configs — keep LF to avoid parsing issues
+# Config files that benefit from stable line endings
 *.json text eol=lf
 *.toml text eol=lf
+*.yaml text eol=lf
 
+# Ignore virtual environments, Python caches
+*.pyc linguist-generated=true
+__pycache__/ linguist-generated=true
+venv/ linguist-generated=true
+.env linguist-generated=true
