@@ -75,6 +75,10 @@ def iss_location():
         logging.exception("Error fetching ISS data")
         return jsonify({"error": "Internal server error"}), 500
 
-
+# Debug mode controlled by FLASK_DEBUG env var (dev-only)
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)  # nosec B201,B104
+    app.run(
+    host="0.0.0.0",
+    port=5000,
+    debug=os.getenv("FLASK_DEBUG", "false").lower() == "true"
+)
