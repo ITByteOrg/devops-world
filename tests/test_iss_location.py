@@ -1,17 +1,18 @@
 # tests/test_iss_location.py
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from src.app import app
-
 import pytest
 from src.app import app
+
+# Ensure the src directory is in the path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 @pytest.fixture
 def client():
     with app.test_client() as client:
         yield client
+
 
 def test_iss_location_success(client, monkeypatch):
     mock_iss_data = {
@@ -31,6 +32,7 @@ def test_iss_location_success(client, monkeypatch):
 
     assert data["latitude"] == 10.0
     assert data["altitude_mi"] == round(420.0 * 0.621371, 2)
+
 
 def test_iss_location_failure(client, monkeypatch):
     # Simulate a failure in the service
