@@ -1,0 +1,18 @@
+# Base runtime dependencies (imported from prod)
+-r requirements.txt
+
+# --- Core testing tools ---
+pytest            # Runs unit tests and test discovery
+coverage          # Measures code coverage during tests
+
+# --- Linting & formatting ---
+flake8            # Python code style checker (PEP8)
+bandit            # Security linter for Python code
+black             # Opinionated code formatter
+isort             # Sorts and organizes imports automatically
+
+# --- Optional developer utilities ---
+httpx             # HTTP client for async/sync API testing
+mypy              # Static type checker for Python
+dotenv-linter     # Validates .env files for bad syntax or duplicates
+
