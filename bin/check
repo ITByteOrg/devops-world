@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+source venv/Scripts/activate || {
+  echo "ERROR: Could not activate venv"
+  exit 1
+}
+
+export PYTHONPATH=src
+
+echo "Running full quality checks..."
+
+echo ">> flake8:"
+flake8 src tests || exit 1
+
+echo ">> bandit:"
+bandit -r src || exit 1
+
+echo ">> pytest:"
+pytest "$@" || exit 1

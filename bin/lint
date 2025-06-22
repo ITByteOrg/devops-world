@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+source venv/Scripts/activate || {
+  echo "ERROR: Could not activate venv"
+  exit 1
+}
+
+echo "Running flake8 linter..."
+flake8 src tests

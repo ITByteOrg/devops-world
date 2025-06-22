@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Ensure venv is activated
+source venv/Scripts/activate || {
+  echo "ERROR: Could not activate virtual environment. Did you create it with: py -m venv venv ?"
+  exit 1
+}
+
+# Set up PYTHONPATH and run tests
+export PYTHONPATH=src
+
+echo "Environment activated. Running tests..."
+pytest "$@"
