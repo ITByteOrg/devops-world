@@ -54,7 +54,7 @@ foreach ($hook in $hookScripts) {
     # Create the shell wrapper
 $wrapperContent = @"
 #!/bin/sh
-exec pwsh "$(dirname "$0")/$baseName.ps1" "$@"
+exec pwsh \"\$(dirname \"\$0\")/$baseName.ps1\" \"\$@\"
 "@
     Set-Content -Path $shDest -Value $wrapperContent -Encoding UTF8
     Write-Log "🔧 Created wrapper: $baseName → $baseName.ps1" -Type "ok"
