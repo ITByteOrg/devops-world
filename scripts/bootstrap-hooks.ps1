@@ -15,7 +15,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = Resolve-Path "$PSScriptRoot\.."
 $GitHooksDir = "$RepoRoot\.git\hooks"
 $HookSourceDir = "$RepoRoot\scripts\githooks"
-$ExpectedFiles = @("pre-push", "TruffleHogShared.psm1", "post-checkout")
+$ExpectedFiles = @("pre-push.ps1", "TruffleHogShared.psm1", "post-checkout")
 
 # Import centralized logger
 Import-Module "$PSScriptRoot\LoggingUtils.psm1" -ErrorAction Stop
