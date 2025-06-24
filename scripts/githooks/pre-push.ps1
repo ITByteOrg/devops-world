@@ -25,8 +25,6 @@ $repoRoot   = Resolve-Path "$scriptRoot/../.."
 $sharedPath = Join-Path $repoRoot "scripts/shared"
 
 $DebugPreference = "Continue"
-Set-PSDebug -Trace 1
-
 
 # Import shared modules
 Import-Module (Join-Path $sharedPath "LoggingUtils.psm1") -ErrorAction Stop
