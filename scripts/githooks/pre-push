@@ -1,43 +1,26 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Git pre-commit hook to scan staged content using TruffleHog.
+    Pre-push hook to run TruffleHog or any additional security checks.
 
 .DESCRIPTION
-    - Imports shared logging utility
-    - Uses shared TruffleHog module to scan staged diffs
-    - Blocks commit if secrets are found
+    This script will be invoked by Git before any push. Customize it
+    to include credential scanning, linting, or push validation logic.
 #>
 
-$ErrorActionPreference = 'Stop'
+# Import shared logging/module utilities if needed
+. "$PSScriptRoot/../../scripts/githooks/LoggingUtils.psm1"
+. "$PSScriptRoot/../../scripts/githooks/TruffleHogShared.psm1"
 
-# Get repo root
-$repoRoot = Resolve-Path "$PSScriptRoot\..\.."
+Write-Log -Message "🚨 Running pre-push hook..." -Type "info"
 
-# Import LoggingUtils
-$logPath = Join-Path -Path $repoRoot -ChildPath "scripts\LoggingUtils.psm1"
-Import-Module $logPath -ErrorAction Stop
+# Run the TruffleHog check (custom logic)
+Invoke-TrufflehogScan -TargetPath "$PSScriptRoot/../../"
 
-# Import TruffleHogShared
-$modulePath = Join-Path -Path $PSScriptRoot -ChildPath "TruffleHogShared.psm1"
-Import-Module $modulePath -ErrorAction Stop
-
-Write-Log "🔍 Running TruffleHog scan before commit..." -Type "info"
-
-# Get staged file contents
-$diff = Get-GitDiffContent -DiffType "cached"
-$files = $diff.Files
-$getContent = $diff.GetContent
-
-if (-not $files -or $files.Count -eq 0) {
-    Write-Log "💤 No staged files to scan. Skipping TruffleHog." -Type "info"
-    exit 0
+if ($LASTEXITCODE -ne 0) {
+    Write-Log -Message "❌ Push blocked due to detected secrets!" -Type "error"
+    exit 1
 }
 
-$logDir = Initialize-TruffleHogLogDir
-$hadSecrets = $false
-
-foreach ($file in $files) {
-    if (Test-FileHasMeaningfulContent $file) {
-        $content = & $getContent.Invoke($file)
-        $result
+Write-Log -Message "✅ Pre-push checks passed!" -Type "success"
+exit 0
