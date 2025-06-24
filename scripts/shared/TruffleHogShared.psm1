@@ -1,7 +1,13 @@
+if (-not $BaseDir) {
+    $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+}
+
+
 function Initialize-TruffleHogLogDir {
     param (
         [string]$BaseDir
     )
+    $script:BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
     $logDir = Join-Path $BaseDir "logs"
     if (-not (Test-Path $logDir)) {
