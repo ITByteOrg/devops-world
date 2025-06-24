@@ -59,7 +59,7 @@ $hadSecrets = $false
 
 foreach ($file in $files) {
     if (Test-FileHasMeaningfulContent $file) {
-        $content = & $getContent.Invoke($file)
+        $content = $getContent.Invoke($file)
 
         $result = Invoke-TrufflehogScan -Content $content -FileName $file -LogDir $logDir
 

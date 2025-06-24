@@ -50,7 +50,7 @@ foreach ($file in $stagedFiles) {
     }
 
     Write-Log "Scanning: $file" -Type "info"
-    $fileContent = & $getContentFunc $file
+    $fileContent = $getContentFunc $file
 
     $scanResult = Invoke-TruffleHogScan `
     -Content $fileContent `
