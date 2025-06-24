@@ -137,6 +137,7 @@ Validates Python code on development branches and pull requests. Runs:
 - Linting with Flake8
 - Security scans with Bandit
 - Tests via Pytest
+- Secret scanning using TruffleHog
 
 </details>
 
