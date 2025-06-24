@@ -27,6 +27,11 @@ Write-Host "[DEBUG] scriptPath: $scriptPath"
 Write-Host "[DEBUG] scriptRoot: $scriptRoot"
 Write-Host "[DEBUG] repoRoot: $repoRoot"
 Write-Host "[DEBUG] sharedPath: $sharedPath"
+Write-Host "======"
+Write-Host "[DEBUG] repoRoot: $repoRoot"
+Write-Host "[DEBUG] sharedPath: $sharedPath"
+Write-Host "[DEBUG] LoggingUtils path: $(Join-Path $sharedPath 'LoggingUtils.psm1')"
+Write-Host "[DEBUG] TruffleHogShared path: $(Join-Path $sharedPath 'TruffleHogShared.psm1')"
 
 # Import shared modules
 Import-Module (Join-Path $sharedPath "LoggingUtils.psm1") -ErrorAction Stop
