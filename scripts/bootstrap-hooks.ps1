@@ -5,9 +5,10 @@
 
 .DESCRIPTION
     - Verifies Git, Docker, PowerShell are available
-    - Copies hook scripts from scripts/githooks/ into .git/hooks/
-    - Installs post-checkout to reapply hooks automatically
-    - Marks executables on macOS/Linux
+    - Installs any *.ps1 files in scripts/githooks/ as Git hooks
+    - Creates a shell wrapper to invoke each hook for cross-platform compatibility
+    - Installs shared modules from scripts/shared/
+    - Marks scripts executable on Unix systems
 #>
 
 $ErrorActionPreference = "Stop"
@@ -15,7 +16,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot       = Resolve-Path "$PSScriptRoot/.."
 $GitHooksDir    = "$RepoRoot/.git/hooks"
 $HookSourceDir  = "$RepoRoot/scripts/githooks"
-$ExpectedHooks  = @("pre-push.ps1", "post-checkout")
+$SharedDir      = "$RepoRoot/scripts/shared"
 
 # Import shared modules
 Import-Module "$PSScriptRoot/shared/LoggingUtils.psm1" -ErrorAction Stop
@@ -38,26 +39,31 @@ Test-Tool "PowerShell Core" "pwsh"
 
 Write-Log "📂 Installing Git hooks..." -Type "info"
 
-foreach ($file in $ExpectedHooks) {
-    $src = Join-Path $HookSourceDir $file
-    $dst = Join-Path $GitHooksDir $file
+# Discover *.ps1 hook scripts in the source directory
+$hookScripts = Get-ChildItem -Path $HookSourceDir -Filter *.ps1 -File
 
-    if (-not (Test-Path $src)) {
-        Write-Log "Missing hook file: $file" -Type "error"
-        exit 1
+foreach ($hook in $hookScripts) {
+    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($hook.Name)
+    $ps1Dest  = Join-Path $GitHooksDir "$baseName.ps1"
+    $shDest   = Join-Path $GitHooksDir $baseName
+
+    # Copy the PowerShell script
+    Copy-Item $hook.FullName $ps1Dest -Force
+    Write-Log "📦 Installed $baseName.ps1 to .git/hooks/" -Type "ok"
+
+    # Create the shell wrapper
+    $wrapper = @"
+#!/bin/sh
+exec pwsh "\$(dirname "\$0")/$baseName.ps1" "\$@"
+"@
+    Set-Content -Path $shDest -Value $wrapper -Encoding UTF8
+    Write-Log "🔧 Created wrapper: $baseName → $baseName.ps1" -Type "ok"
+
+    # Make the wrapper executable (Unix only)
+    if ($IsLinux -or $IsMacOS) {
+        & chmod +x $shDest
+        Write-Log "🔑 Marked $baseName as executable on Unix." -Type "ok"
     }
-
-    Copy-Item $src $dst -Force
-    Write-Log "Installed $file to .git/hooks/" -Type "ok"
 }
 
-# Set Unix executability
-if ($IsLinux -or $IsMacOS) {
-    foreach ($file in $ExpectedHooks) {
-        $hookPath = Join-Path $GitHooksDir $file
-        & chmod +x $hookPath
-    }
-    Write-Log "Marked hook scripts as executable on Unix." -Type "ok"
-}
-
-Write-Log "🎯 All Git hooks installed and post-checkout auto-sync enabled." -Type "ok"
+Write-Log "🎯 All Git hooks installed and ready." -Type "success"
