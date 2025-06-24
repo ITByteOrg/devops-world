@@ -1,26 +1,60 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Pre-push hook to run TruffleHog or any additional security checks.
+    Git pre-push hook to scan commits about to be pushed using TruffleHog.
 
 .DESCRIPTION
-    This script will be invoked by Git before any push. Customize it
-    to include credential scanning, linting, or push validation logic.
+    - Imports shared logging and scan logic
+    - Diffs local branch against remote to isolate new changes
+    - Blocks push if secrets are detected
 #>
 
-# Import shared logging/module utilities if needed
-. "$PSScriptRoot/../shared/LoggingUtils.psm1"
-. "$PSScriptRoot/../shared/TruffleHogShared.psm1"
+$ErrorActionPreference = 'Stop'
+
+# Resolve repo root (assumes this lives in scripts/githooks/)
+$repoRoot   = Resolve-Path "$PSScriptRoot/../.."
+$sharedPath = Join-Path $repoRoot "scripts/shared"
+
+# Import shared modules
+Import-Module (Join-Path $sharedPath "LoggingUtils.psm1") -ErrorAction Stop
+Import-Module (Join-Path $sharedPath "TruffleHogShared.psm1") -ErrorAction Stop
 
 Write-Log -Message "🚨 Running pre-push hook..." -Type "info"
 
-# Run the TruffleHog check (custom logic)
-Invoke-TrufflehogScan -TargetPath "$PSScriptRoot/../../"
+# Get diff content between remote and local
+$diff = Get-GitDiffContent -DiffType "push"
+$files = $diff.Files
+$getContent = $diff.GetContent
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Log -Message "❌ Push blocked due to detected secrets!" -Type "error"
-    exit 1
+if (-not $files -or $files.Count -eq 0) {
+    Write-Log -Message "🟡 Nothing new to push. Skipping secret scan." -Type "warn"
+    exit 0
 }
 
-Write-Log -Message "✅ Pre-push checks passed!" -Type "success"
-exit 0
+$logDir = Initialize-TruffleHogLogDir
+$hadSecrets = $false
+
+foreach ($file in $files) {
+    if (Test-FileHasMeaningfulContent $file) {
+        $content = & $getContent.Invoke($file)
+
+        $result = Invoke-TrufflehogScan -Content $content -FileName $file -LogDir $logDir
+
+        if ($result.HasSecrets) {
+            $hadSecrets = $true
+            Write-Log -Message "🔒 Secret detected in $file" -Type "error"
+        } else {
+            Write-Log -Message "✅ Clean: $file" -Type "ok"
+        }
+    } else {
+        Write-Log -Message "⏭️ Skipped (empty/untracked): $file" -Type "debug"
+    }
+}
+
+if ($hadSecrets) {
+    Write-Log -Message "⛔ Push aborted: Secrets were found in files above." -Type "error"
+    exit 1
+} else {
+    Write-Log -Message "🎉 All clear! No secrets detected. Proceeding with push." -Type "success"
+    exit 0
+}

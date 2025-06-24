@@ -13,21 +13,37 @@ function Initialize-TruffleHogLogDir {
 
 function Get-GitDiffContent {
     param (
-        [string]$DiffType = "cached",
-        [string[]]$FileFilters = @("A", "M")
+        [ValidateSet("cached", "push")]
+        [string]$DiffType = "cached"
     )
 
-    $diffArgs = @("diff", "--$DiffType", "--name-only", "--diff-filter=$($FileFilters -join '')")
-    $files = git @diffArgs | Where-Object { $_ -and (Test-Path $_) }
+    if ($DiffType -eq "cached") {
+        $files = git diff --cached --name-only | Where-Object { Test-Path $_ }
 
-    return @{
-        Files = $files
-        GetContent = {
-            param ($file)
-            git show ":$file"
+        return @{
+            Files = $files
+            GetContent = { param($file) Get-Content $file -Raw }
+        }
+    }
+
+    if ($DiffType -eq "push") {
+        # Get current and upstream branches
+        $localBranch  = git symbolic-ref --short HEAD
+        $remoteBranch = "origin/$localBranch"
+
+        # Ensure remote is up to date
+        git fetch origin $localBranch
+
+        # Collect all files changed between the remote and local branches
+        $files = git diff --name-only $remoteBranch $localBranch | Where-Object { Test-Path $_ }
+
+        return @{
+            Files = $files
+            GetContent = { param($file) Get-Content $file -Raw }
         }
     }
 }
+
 
 function Test-FileHasMeaningfulContent {
     param (
