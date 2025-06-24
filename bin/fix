@@ -1,8 +1,8 @@
-#!/usr/bin/env pwsh
-<#====================================================================
- 🛠️ FIX
- Description : Auto-healing, remediation logic, or fallbacks.
-====================================================================#>
+#!/usr/bin/env bash
+# ====================================================================
+# FIX
+# Description : Auto-healing, remediation logic, or fallbacks.
+# ====================================================================
 
 # Load environment variables
 if [ -f .env ]; then
