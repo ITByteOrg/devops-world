@@ -52,11 +52,11 @@ foreach ($hook in $hookScripts) {
     Write-Log "📦 Installed $baseName.ps1 to .git/hooks/" -Type "ok"
 
     # Create the shell wrapper
-$wrapperContent = @'
+$wrapperContent = @"
 #!/bin/sh
-exec pwsh "$(dirname "$0")/'"$baseName"'.ps1" "$@"
-'@
-    Set-Content -Path $shDest -Value $wrapper -Encoding UTF8
+exec pwsh "$(dirname "$0")/$baseName.ps1" "$@"
+"@
+    Set-Content -Path $shDest -Value $wrapperContent -Encoding UTF8
     Write-Log "🔧 Created wrapper: $baseName → $baseName.ps1" -Type "ok"
 
     # Make the wrapper executable (Unix only)
