@@ -11,14 +11,22 @@
 
 $ErrorActionPreference = 'Stop'
 
-# Resolve repo root (assumes this lives in scripts/githooks/)
-if (-not $PSScriptRoot) {
-    Write-Error "❌ \$PSScriptRoot is empty — cannot resolve repo root. Did the script run directly or via Git hook?"
+$ErrorActionPreference = 'Stop'
+
+# Resolve repo root (based on this file’s path)
+$scriptPath = $MyInvocation.MyCommand.Path
+if (-not $scriptPath) {
+    Write-Error "❌ Could not determine script path. This script may not be running in a file-bound context."
     exit 1
 }
 
-$repoRoot = Resolve-Path "$PSScriptRoot/../.."
+$scriptRoot = Split-Path -Parent $scriptPath
+$repoRoot   = Resolve-Path "$scriptRoot/../.."
 $sharedPath = Join-Path $repoRoot "scripts/shared"
+Write-Host "[DEBUG] scriptPath: $scriptPath"
+Write-Host "[DEBUG] scriptRoot: $scriptRoot"
+Write-Host "[DEBUG] repoRoot: $repoRoot"
+Write-Host "[DEBUG] sharedPath: $sharedPath"
 
 # Import shared modules
 Import-Module (Join-Path $sharedPath "LoggingUtils.psm1") -ErrorAction Stop
