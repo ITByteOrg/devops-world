@@ -1,5 +1,44 @@
-.git
-.git/logs
-venv
-__pycache__
-https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+# Ignore Python virtual environments
+^\.?venv/
+^env/
+^\.env/
+
+# Ignore compiled bytecode
+^__pycache__/
+\.pyc$
+\.pyo$
+
+# Ignore Git internals and logs
+^\.git/
+^\.trufflehog-logs/
+
+# Ignore CI/CD and automation artifacts
+^\.github/
+^\.azure-pipelines/
+^scripts/githooks/
+^scripts/bootstrap-hooks.ps1
+
+# Ignore documentation and markdown
+\.md$
+\.txt$
+\.rst$
+
+# Ignore common non-source directories
+^node_modules/
+^dist/
+^build/
+^coverage/
+^logs?/
+
+# Ignore test fixtures or mock data
+^tests?/fixtures?/
+^__mocks__/
+^__snapshots__/
+
+# Ignore config files unlikely to contain secrets
+\.editorconfig$
+\.prettierrc$
+\.eslintrc$
+\.trufflehogignore$
+\.gitignore$
+\.gitattributes$

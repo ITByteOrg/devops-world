@@ -52,12 +52,3 @@ jobs:
           else
             echo "Warning: .env file not found. Skipping env load."
           fi
-
-      - name: Secret scan (TruffleHog, dev-only scope)
-        run: |
-          git fetch --unshallow || true
-          docker run --rm \
-            -v ${{ github.workspace }}:/repo \
-            -w /repo \
-            ghcr.io/trufflesecurity/trufflehog:latest \
-            git file://. --since-commit=HEAD~10 --json

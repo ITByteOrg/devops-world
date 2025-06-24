@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#====================================================================
+# DEV
+# Description : Dev-mode helpers, test scaffolding, or debugging hooks.
+# ====================================================================
 
 # Load environment variables
 if [ -f .env ]; then

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# ====================================================================
+# LINT
+# Description : Code formatting, static analysis, or cleanup utilities.
+# ====================================================================
 
 # Load environment variables
 if [ -f .env ]; then
