@@ -9,8 +9,8 @@
 #>
 
 # Import shared logging/module utilities if needed
-. "$PSScriptRoot/../../scripts/githooks/LoggingUtils.psm1"
-. "$PSScriptRoot/../../scripts/githooks/TruffleHogShared.psm1"
+. "$PSScriptRoot/../shared/LoggingUtils.psm1"
+. "$PSScriptRoot/../shared/TruffleHogShared.psm1"
 
 Write-Log -Message "🚨 Running pre-push hook..." -Type "info"
 

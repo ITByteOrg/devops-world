@@ -12,13 +12,14 @@
 
 $ErrorActionPreference = "Stop"
 
-$RepoRoot = Resolve-Path "$PSScriptRoot\.."
-$GitHooksDir = "$RepoRoot\.git\hooks"
-$HookSourceDir = "$RepoRoot\scripts\githooks"
-$ExpectedFiles = @("pre-push.ps1", "TruffleHogShared.psm1", "post-checkout")
+$RepoRoot       = Resolve-Path "$PSScriptRoot/.."
+$GitHooksDir    = "$RepoRoot/.git/hooks"
+$HookSourceDir  = "$RepoRoot/scripts/githooks"
+$ExpectedHooks  = @("pre-push.ps1", "post-checkout")
 
-# Import centralized logger
-Import-Module "$PSScriptRoot\LoggingUtils.psm1" -ErrorAction Stop
+# Import shared modules
+Import-Module "$PSScriptRoot/shared/LoggingUtils.psm1" -ErrorAction Stop
+Import-Module "$PSScriptRoot/shared/TruffleHogShared.psm1" -ErrorAction Stop
 
 Write-Log "🔍 Verifying environment..." -Type "info"
 
@@ -37,7 +38,7 @@ Test-Tool "PowerShell Core" "pwsh"
 
 Write-Log "📂 Installing Git hooks..." -Type "info"
 
-foreach ($file in $ExpectedFiles) {
+foreach ($file in $ExpectedHooks) {
     $src = Join-Path $HookSourceDir $file
     $dst = Join-Path $GitHooksDir $file
 
@@ -50,8 +51,9 @@ foreach ($file in $ExpectedFiles) {
     Write-Log "Installed $file to .git/hooks/" -Type "ok"
 }
 
+# Set Unix executability
 if ($IsLinux -or $IsMacOS) {
-    foreach ($file in $ExpectedFiles){
+    foreach ($file in $ExpectedHooks) {
         $hookPath = Join-Path $GitHooksDir $file
         & chmod +x $hookPath
     }

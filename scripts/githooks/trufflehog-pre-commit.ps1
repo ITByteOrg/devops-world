@@ -14,7 +14,7 @@
 $ErrorActionPreference = 'Stop'
 
 # Import logging module
-$LogModulePath = Join-Path $PSScriptRoot "LoggingUtils.psm1"
+$LogModulePath = Join-Path $PSScriptRoot "../shared/LoggingUtils.psm1"
 if (-not (Test-Path $LogModulePath)) {
     Write-Log "❌ Missing LoggingUtils.psm1 at: $LogModulePath" -Type "error"
     exit 1
@@ -22,7 +22,7 @@ if (-not (Test-Path $LogModulePath)) {
 Import-Module $LogModulePath -Force
 
 # Import shared TruffleHog logic
-$SharedModulePath = Join-Path $PSScriptRoot "TruffleHogShared.psm1"
+$SharedModulePath = Join-Path $PSScriptRoot "../shared/TruffleHogShared.psm1"
 if (-not (Test-Path $SharedModulePath)) {
     Write-Log "❌ Could not find TruffleHogShared.psm1 at: $SharedModulePath" -Type "error"
     exit 1
