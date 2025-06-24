@@ -23,15 +23,6 @@ if (-not $scriptPath) {
 $scriptRoot = Split-Path -Parent $scriptPath
 $repoRoot   = Resolve-Path "$scriptRoot/../.."
 $sharedPath = Join-Path $repoRoot "scripts/shared"
-Write-Host "[DEBUG] scriptPath: $scriptPath"
-Write-Host "[DEBUG] scriptRoot: $scriptRoot"
-Write-Host "[DEBUG] repoRoot: $repoRoot"
-Write-Host "[DEBUG] sharedPath: $sharedPath"
-Write-Host "======"
-Write-Host "[DEBUG] repoRoot: $repoRoot"
-Write-Host "[DEBUG] sharedPath: $sharedPath"
-Write-Host "[DEBUG] LoggingUtils path: $(Join-Path $sharedPath 'LoggingUtils.psm1')"
-Write-Host "[DEBUG] TruffleHogShared path: $(Join-Path $sharedPath 'TruffleHogShared.psm1')"
 
 $DebugPreference = "Continue"
 Set-PSDebug -Trace 1
