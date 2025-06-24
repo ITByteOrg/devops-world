@@ -1,50 +1,55 @@
-$global:IsCI = $env:CI -or $env:GITHUB_ACTIONS -or $env:BUILD_BUILDID
+<#
+.SYNOPSIS
+    Utility module for standardized logging across scripts.
+
+.DESCRIPTION
+    Provides emoji-enhanced, color-coded log output for Git hooks and CI workflows.
+    Supports optional file logging when enabled by the caller.
+
+.EXPORTS
+    Write-Log
+
+#>
 
 function Write-Log {
-    param(
+    param (
+        [Parameter(Mandatory)]
         [string]$Message,
-        [ValidateSet("info", "ok", "warn", "error", "debug")]
+
+        [ValidateSet("info", "warn", "error", "success", "ok", "debug")]
         [string]$Type = "info",
-        [switch]$ToFile
+
+        [switch]$ToFile,
+
+        [string]$LogDir
     )
 
-    # Emoji and color setup
+    $global:IsCI = $env:CI -or $env:GITHUB_ACTIONS -or $env:BUILD_BUILDID
+
     if (-not $IsCI) {
         $iconMap = @{
-            info  = "[INFO]"
-            ok    = "[OK]"
-            warn  = "[WARN]"
-            error = "[ERROR]"
-            debug = "[DEBUG]"
-        }        
-        $colorMap = @{
-            info  = "Gray"
-            ok    = "Green"
-            warn  = "Yellow"
-            error = "Red"
-            debug = "DarkGray"
+            info    = "[INFO]"      warn    = "[WARN]"
+            error   = "[ERROR]"     success = "[SUCCESS]"
+            ok      = "[OK]"        debug   = "[DEBUG]"
         }
-    } else {
-        $iconMap = @{}
-        $colorMap = @{ default = "White" }
+        $colorMap = @{
+            info    = "Cyan"; warn    = "Yellow"; error  = "Red"
+            success = "Green"; ok     = "Green";  debug  = "Gray"
+            default = "White"
+        }
+
+        $prefix = if ($iconMap.ContainsKey($Type)) { "$($iconMap[$Type]) " } else { "" }
+        $color  = if ($colorMap.ContainsKey($Type)) { $colorMap[$Type] } else { $colorMap["default"] }
+
+        Write-Host "$prefix$Message" -ForegroundColor $color
     }
 
-    $prefix = if ($iconMap.ContainsKey($Type)) { "$($iconMap[$Type]) " } else { "" }
-    $color = if ($colorMap.ContainsKey($Type)) { $colorMap[$Type] } else { $colorMap["default"] }
-
-
-    Write-Host "$prefix$Message" -ForegroundColor $color
-
-    if ($ToFile) {
-
-Write-Host "[DEBUG] PSScriptRoot in LoggingUtils: '$PSScriptRoot'"
-
-        $logDir = Join-Path $PSScriptRoot "logs"
-        if (-not (Test-Path $logDir)) {
-            New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+    if ($ToFile -and $LogDir) {
+        $logFile = Join-Path $LogDir "bootstrap.log"
+        if (-not (Test-Path $LogDir)) {
+            New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
         }
 
-        $logFile = Join-Path $logDir "bootstrap.log"
         $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
         Add-Content -Path $logFile -Value "[$timestamp][$Type] $Message"
     }

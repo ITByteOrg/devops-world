@@ -1,19 +1,40 @@
+<#
+.SYNOPSIS
+    Shared helper functions for running TruffleHog secret scans.
+
+.DESCRIPTION
+    Encapsulates logic for:
+        - Initializing scan log directories
+        - Normalizing file content for scanning
+        - Invoking TruffleHog with consistent parameters
+    Designed for use in Git hook scripts and automated security scans.
+
+.EXPORTS
+    Initialize-TruffleHogLogDir
+    Invoke-TrufflehogScan
+    Test-FileHasMeaningfulContent
+
+.NOTES
+    Assumes the calling script resolves and passes a valid `BaseDir` path if not run directly.
+#>
+
 if (-not $BaseDir) {
     $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 }
-
 
 function Initialize-TruffleHogLogDir {
     param (
         [string]$BaseDir
     )
-    $script:BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+    if (-not $BaseDir) {
+        throw "❌ BaseDir is null — can't resolve log directory."
+    }
 
     $logDir = Join-Path $BaseDir "logs"
     if (-not (Test-Path $logDir)) {
         New-Item -ItemType Directory -Path $logDir -Force | Out-Null
     }
-
     return $logDir
 }
 

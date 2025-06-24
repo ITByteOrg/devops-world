@@ -53,7 +53,8 @@ if (-not $files -or $files.Count -eq 0) {
     exit 0
 }
 
-$logDir = Initialize-TruffleHogLogDir
+$baseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$logDir = Initialize-TruffleHogLogDir -BaseDir $baseDir
 $hadSecrets = $false
 
 foreach ($file in $files) {
