@@ -12,7 +12,12 @@
 $ErrorActionPreference = 'Stop'
 
 # Resolve repo root (assumes this lives in scripts/githooks/)
-$repoRoot   = Resolve-Path "$PSScriptRoot/../.."
+if (-not $PSScriptRoot) {
+    Write-Error "❌ \$PSScriptRoot is empty — cannot resolve repo root. Did the script run directly or via Git hook?"
+    exit 1
+}
+
+$repoRoot = Resolve-Path "$PSScriptRoot/../.."
 $sharedPath = Join-Path $repoRoot "scripts/shared"
 
 # Import shared modules
