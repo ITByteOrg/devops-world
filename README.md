@@ -117,7 +117,6 @@ devops-world/
 │── requirements.txt    # Python dependencies
 │── README.md           # Project documentation
 │── .gitignore          # Git ignore rules
-│── .trufflehogignore   # Trufflehog ignore rules
 │── src/                # Application source code
 │   ├── app.py          # Main application script
 │   └── iss_service.py  # API call to location of ISS
@@ -138,7 +137,6 @@ Validates Python code on development branches and pull requests. Runs:
 - Linting with Flake8
 - Security scans with Bandit
 - Tests via Pytest
-- Secret scanning using TruffleHog
 
 </details>
 

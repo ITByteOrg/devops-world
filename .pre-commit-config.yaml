@@ -1,0 +1,17 @@
+# ------------------------------------------------------------------------------
+# pre-commit configuration
+# This file defines Git hooks that are run automatically on commits/pushes.
+# - Managed via the Python `pre-commit` framework
+# - Includes local PowerShell-based TruffleHog scan via Docker
+# - To install: run `pre-commit install` (inside an activated venv)
+# ------------------------------------------------------------------------------
+repos:
+  - repo: local
+    hooks:
+      - id: trufflehog-pwsh
+        name: TruffleHog Custom PowerShell Hook
+        entry: pwsh scripts/githooks/trufflehog-pre-commit.ps1
+        language: system
+        types: [text]
+        always_run: true
+        pass_filenames: false

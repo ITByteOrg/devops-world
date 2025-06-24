@@ -1,3 +1,7 @@
+<#====================================================================
+ 🧼 LINT
+ Description : Code formatting, static analysis, or cleanup utilities.
+====================================================================#>
 #!/usr/bin/env bash
 
 # Load environment variables

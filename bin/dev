@@ -1,3 +1,7 @@
+<#====================================================================
+ 🧪 DEV
+ Description : Dev-mode helpers, test scaffolding, or debugging hooks.
+====================================================================#>
 #!/usr/bin/env bash
 
 # Load environment variables

@@ -1,3 +1,7 @@
+<#====================================================================
+ 💡 CHECK
+ Description : Validation logic, preconditions, or integrity checks.
+====================================================================#>
 #!/usr/bin/env bash
 
 # Load environment variables
