@@ -28,9 +28,9 @@ function Write-Log {
 
     if (-not $IsCI) {
         $iconMap = @{
-            info    = "[INFO]"      warn    = "[WARN]"
-            error   = "[ERROR]"     success = "[SUCCESS]"
-            ok      = "[OK]"        debug   = "[DEBUG]"
+            info    = "[INFO]";      warn    = "[WARN]"
+            error   = "[ERROR]";     success = "[SUCCESS]"
+            ok      = "[OK]";        debug   = "[DEBUG]"
         }
         $colorMap = @{
             info    = "Cyan"; warn    = "Yellow"; error  = "Red"
