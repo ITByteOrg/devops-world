@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# pre-commit configuration
+# pre-commit configuration file
 # This file defines Git hooks that are run automatically on commits/pushes.
 # - Managed via the Python `pre-commit` framework
 # - Includes local PowerShell-based TruffleHog scan via Docker
