@@ -66,4 +66,4 @@ exec pwsh "\$(dirname "\$0")/$baseName.ps1" "\$@"
     }
 }
 
-Write-Log "🎯 All Git hooks installed and ready." -Type "success"
+Write-Log "🎯 All Git hooks installed and ready." -Type "info"
