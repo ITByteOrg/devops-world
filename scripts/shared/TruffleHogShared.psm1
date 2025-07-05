@@ -116,7 +116,7 @@ function Invoke-TruffleHogScan {
             Raw = $result
         }
     } catch {
-        Write-ErrorLog "TruffleHog scan failed for $SourceDescription"
+        Write-Log "TruffleHog scan failed for $SourceDescription", "Error: $_" -Type "error"
         return @{
             HasSecrets = $false
             HasError = $true
