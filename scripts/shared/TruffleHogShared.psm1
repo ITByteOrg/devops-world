@@ -18,6 +18,9 @@
     Assumes the calling script resolves and passes a valid `BaseDir` path if not run directly.
 #>
 
+# Import shared modules
+Import-Module (Join-Path $sharedPath "LoggingUtils.psm1") -ErrorAction Stop
+
 if (-not $BaseDir) {
     $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 }
