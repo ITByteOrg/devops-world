@@ -18,6 +18,9 @@
     Assumes the calling script resolves and passes a valid `BaseDir` path if not run directly.
 #>
 
+# Import shared modules
+Import-Module (Join-Path $sharedPath "LoggingUtils.psm1") -ErrorAction Stop
+
 if (-not $BaseDir) {
     $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 }
@@ -116,7 +119,7 @@ function Invoke-TruffleHogScan {
             Raw = $result
         }
     } catch {
-        Write-ErrorLog "TruffleHog scan failed for $SourceDescription"
+        Write-Log -Message ("Scan failed for {0}. Error: {1}" -f $SourceDescription, $_) -Type "error"
         return @{
             HasSecrets = $false
             HasError = $true
