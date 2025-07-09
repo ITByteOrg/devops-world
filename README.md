@@ -170,7 +170,7 @@ Manual GitHub Actions for branch logic + context inspection
 ---
 ## Next Step
 
-After setting up the repositories and scaffolding the application, I focused on establishing a strong CI/CD framework. Although the order suited this exploratory build, I’d reverse it in a production context—starting with a robust CI/CD pipeline. Laying that foundation early promotes good engineering hygiene—enforcing automated scans, pull request gates, and approval workflows before anything lands in main. As I continue to build out the project, I will likely reorder these pages, but for now, the journey continues. My next stop in the journey was devops-infra for the Terraform setup. 
+After setting up the repositories and scaffolding the application, I focused on establishing a strong CI/CD framework. Although the order suited this exploratory build, I’d reverse it in a production context by starting with a robust CI/CD pipeline. Laying that foundation early promotes good engineering hygiene by enforcing automated scans, pull request gates, and approval workflows before anything lands in main. As I continue to build out the project, I will likely reorder these pages, but for now, the journey continues. My next stop in the journey was devops-infra for the Terraform setup. 
 
 ---
 ## License
