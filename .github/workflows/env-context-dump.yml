@@ -1,3 +1,8 @@
+# ────────────────────────────────────────────────
+# Workflow: env-context-dump
+# Purpose : Diagnostic Tool: Dump GitHub Actions context and environment variables
+# Trigger : manually via workflow_dispatch
+# ────────────────────────────────────────────────
 name: 🛠 GitHub Actions Context Dump
 
 on:
