@@ -7,9 +7,9 @@ Welcome to **DevOps World**, a simple Python application designed to be tested a
 ## Overview
 This repository contains a simple Python application slightly more interesting than "Hello World". In this journey, I'm focusing on the DevOps stack. This repo is only for the application, as separate repos were set up for infrastructure, security, and monitoring configurations. As the project progresses, the repository links below will expand with details on cloud deployment, CI/CD pipelines, security scanning, and monitoring practices.
 
-- **DevOps Infrastructure:** [`devops-infra`](https://github.com/ITByteEnthusiast/devops-infra/blob/main/README.md)  
-- **DevOps Security:** [`devops-security`](https://github.com/ITByteEnthusiast/devops-security/blob/main/README.md)  
-- **DevOps Monitoring:** [`devops-monitoring`](https://github.com/ITByteEnthusiast/devops-monitoring/blob/main/README.md)  
+- **DevOps Infrastructure:** [`devops-infra`](https://github.com/ITByteOrg/devops-infra/blob/main/README.md)  
+- **DevOps Security:** [`devops-security`](https://github.com/ITByteOrg/devops-security/blob/main/README.md)  
+- **DevOps Monitoring:** To Be Created  
 
 ---
 
