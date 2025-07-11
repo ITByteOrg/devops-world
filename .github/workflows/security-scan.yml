@@ -1,0 +1,47 @@
+# ────────────────────────────────────────────────
+# Workflow: security_scan.yml
+# Purpose : Run security scans on the codebase
+# Trigger : push to main, pull_request to main
+# ────────────────────────────────────────────────
+name: Security Scanning Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  secret-scanning:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install trufflehog bandit
+
+      - name: Run TruffleHog scan
+        run: |
+          trufflehog filesystem --directory . --json --exclude_paths .venv,node_modules
+
+      - name: Run Bandit scan (optional for Python code security)
+        run: |
+          bandit -r .
+
+      - name: Upload TruffleHog results (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: trufflehog-results
+          path: trufflehog-results.json

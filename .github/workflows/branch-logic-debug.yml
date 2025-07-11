@@ -1,3 +1,8 @@
+# ────────────────────────────────────────────────
+# Workflow: branch-logic-debug
+# Purpose : Diagnostic tool: test branch names - manually triggered
+# Trigger : manually via workflow_dispatch
+# ────────────────────────────────────────────────
 name: 🔍 Branch Matching Debugger
 
 on:
