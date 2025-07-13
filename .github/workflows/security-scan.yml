@@ -34,7 +34,7 @@ jobs:
 
       - name: Run TruffleHog scan
         run: |
-          trufflehog filesystem --directory . --json --exclude_paths .venv,node_modules
+          trufflehog filesystem --directory . --json --exclude_paths_file .trufflehog-exclude.json
 
       - name: Run Bandit scan (optional for Python code security)
         run: |
