@@ -18,9 +18,15 @@
     Assumes the calling script resolves and passes a valid `BaseDir` path if not run directly.
 #>
 
+Write-Host "🔍 TruffleHogShared.psm1 loading..."
 # Import shared modules
-Import-Module (Join-Path $sharedPath "LoggingUtils.psm1") -ErrorAction Stop
+if ($sharedPath) {
+    $SafePath = Join-Path -Path $sharedPath -ChildPath 'subdir'
+} else {
+    Write-Host "⚠️ sharedPath is null in module. Skipping path join."
+}
 
+#Import-Module (Join-Path $sharedPath "LoggingUtils.psm1") -ErrorAction Stop
 if (-not $BaseDir) {
     $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 }
@@ -147,3 +153,9 @@ function Test-BinFilesForCRLF {
 
     return $crlfFound
 }
+
+Export-ModuleMember `
+    -Function Initialize-TruffleHogLogDir, `
+              Invoke-TruffleHogScan, `
+              Test-FileHasMeaningfulContent, `
+              Get-GitDiffContent

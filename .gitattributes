@@ -4,6 +4,9 @@ bin/* text eol=lf
 # Python source files: normalized line endings
 *.py text eol=lf
 
+# PowerShell scripts: normalized line endings
+*.ps1 text eol=lf
+
 # VS Code configurations and tasks
 .vscode/* text eol=lf
 

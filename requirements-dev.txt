@@ -1,17 +1,23 @@
 # Base runtime dependencies (imported from prod)
--r requirements.txt
+-r requirements.txt         # Good practice if your dev env also runs core code
 
 # --- Core testing tools ---
-pytest            # Runs unit tests and test discovery
-coverage          # Measures code coverage during tests
+pytest==7.4.0               # Excellent for unit tests
+pytest-cov==6.2.1
+coverage==7.4.1             # Complements pytest with coverage reports
 
 # --- Linting & formatting ---
-flake8            # Python code style checker (PEP8)
-bandit            # Security linter for Python code
-black             # Opinionated code formatter
-isort             # Sorts and organizes imports automatically
+flake8==6.1.0               # Style checking for python
+bandit==1.7.6               # Security linting for Python code
+black==24.3.0               # Code formatting
+isort==5.12.0               # Import sorting
+
+# --- Optional developer utilities ---
+mypy==1.10.0                # Static type checking
+dotenv-linter==0.4.0        # Validates .env files
 
 # --- Optional developer utilities ---
 httpx             # HTTP client for async/sync API testing
 mypy              # Static type checker for Python
 dotenv-linter     # Validates .env files for bad syntax or duplicates
+

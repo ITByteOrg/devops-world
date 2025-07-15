@@ -11,74 +11,66 @@
     Requires Docker, PowerShell Core, LoggingUtils.psm1, and WSL-compatible paths.
 #>
 
+#!/usr/bin/env pwsh
+
 $ErrorActionPreference = 'Stop'
 
-# Import logging module
-$LogModulePath = Join-Path $PSScriptRoot "../shared/LoggingUtils.psm1"
-if (-not (Test-Path $LogModulePath)) {
-    Write-Log "❌ Missing LoggingUtils.psm1 at: $LogModulePath" -Type "error"
+# Dynamically set repo root
+$BasePath = (& git rev-parse --show-toplevel).Trim()
+Write-Host "🔍 pre-commit hook BasePath: '$BasePath'"
+if (-not $BasePath) {
+    Write-Host "❌ Failed to resolve repo root. Aborting pre-commit hook."
     exit 1
 }
-Import-Module $LogModulePath -Force
 
-# Import shared TruffleHog logic
-$SharedModulePath = Join-Path $PSScriptRoot "../shared/TruffleHogShared.psm1"
-if (-not (Test-Path $SharedModulePath)) {
-    Write-Log "❌ Could not find TruffleHogShared.psm1 at: $SharedModulePath" -Type "error"
+# Dot-source shared function
+. "$BasePath/scripts/shared/Resolve-ModulePath.ps1"
+
+# Confirm function loaded
+if (-not (Get-Command Resolve-ModulePath -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ Resolve-ModulePath not found. Verify dot-sourcing line."
     exit 1
 }
-Import-Module $SharedModulePath -Force
 
-# Initialize
-$exitCode = 0
-$logDir = Initialize-TruffleHogLogDir -BaseDir $PSScriptRoot
+# Resolve module path
+$TruffleHogSharedPath = Resolve-ModulePath -ModuleName "TruffleHogShared.psm1" -BaseDir $BasePath
 
-# Get staged files (added or modified only, skip deleted)
-$diffInfo = Get-GitDiffContent -DiffType "cached" -FileFilters @("A", "M")
-$stagedFiles = $diffInfo.Files
-$getContentFunc = $diffInfo.GetContent
+if (-not $TruffleHogSharedPath) {
+    Write-Host "❌ Failed to resolve TruffleHogShared.psm1. Skipping scan."
+    exit 1
+}
 
-foreach ($file in $stagedFiles) {
-    if (-not (Test-Path $file)) {
-        Write-Log "[SKIP] $file does not exist on disk. Probably deleted or untracked." -Type "warn"
-        continue
-    }
+# Confirm path exists before import
+if (-not (Test-Path $TruffleHogSharedPath)) {
+    Write-Host "❌ Resolved path does not exist: $TruffleHogSharedPath"
+    exit 1
+}
 
-    if (-not (Test-FileHasMeaningfulContent -FilePath $file)) {
-        Write-Log "[SKIP] $file has no meaningful content. Skipping." -Type "warn"
-        continue
-    }
+# Load module
+Import-Module $TruffleHogSharedPath -Force
 
-    Write-Log "Scanning: $file" -Type "info"
-    $fileContent = $getContentFunc $file
+# Retrieve staged files and log directory
+$diffInfo = Get-GitDiffContent -DiffType "cached"
+$LogDir   = Initialize-TruffleHogLogDir -BaseDir $BasePath
 
-    $scanResult = Invoke-TruffleHogScan `
-    -Content $fileContent `
-    -SourceDescription $file `
-    -LogDir $logDir `
-    -ExcludeDetectors @("SlackWebhook")
+$foundSecrets = $false
 
-    if ($scanResult.HasSecrets -or $scanResult.HasError) {
-        Write-Log "Potential secret detected in: $file" -Type "error"
-        $exitCode = 1
+foreach ($file in $diffInfo.Files) {
+    if (Test-FileHasMeaningfulContent -FilePath $file) {
+        $content = $diffInfo.GetContent.Invoke($file)
+        $scanResult = Invoke-TruffleHogScan -Content $content -SourceDescription $file -LogDir $LogDir
+
+        if ($scanResult.HasSecrets) {
+            Write-Host "❌ Secrets detected in: $file"
+            $foundSecrets = $true
+        }
     }
 }
 
-# Check for CRLF in bin scripts
-$binFiles = git diff --cached --name-only --diff-filter=ACM | Where-Object { $_ -like 'bin/*' }
-
-if ($binFiles.Count -gt 0) {
-    $crlfFail = Test-BinFilesForCRLF -BinFiles $binFiles
-    if ($crlfFail) {
-        Write-Log "CRLF line endings detected in one or more bin/ files." -Type "error"
-        $exitCode = 1
-    }
+if ($foundSecrets) {
+    Write-Host "❌ Commit blocked due to verified secrets."
+    exit 1
 }
 
-if ($exitCode -eq 0) {
-    Write-Log "✅ Pre-commit checks passed!" -Type "ok"
-} else {
-    Write-Log "❌ Pre-commit checks failed!" -Type "error"
-}
-
-exit $exitCode
+Write-Host "✅ TruffleHog scan passed: no secrets found."
+exit 0

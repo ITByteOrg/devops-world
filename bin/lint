@@ -4,6 +4,9 @@
 # Description : Code formatting, static analysis, or cleanup utilities.
 # ====================================================================
 
+# Load shared utilities
+source scripts/shared/lint-utils.sh
+
 # Load environment variables
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
@@ -11,13 +14,41 @@ else
   echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
 fi
 
+# Activate venv (cross-platform)
+source scripts/shared/bootstrap.sh
 
-VENV_PY="venv/Scripts/python.exe"
-
-if [ ! -x "$VENV_PY" ]; then
-  echo "❌ ERROR: Could not find venv Python at $VENV_PY"
-  exit 1
-fi
-
-echo "🔍 Running flake8 via venv..."
+echo "Running flake8 via venv..."
 "$VENV_PY" -m flake8 src tests
+FLAKE8_VENV_OK=$?
+[[ $FLAKE8_VENV_OK -eq 0 ]] || echo "❌ flake8 (venv) failed"
+
+LINT_STATUS="   [OK] All lint checks passed"
+LINT_ACTIONS=""
+EXIT_CODE=0
+
+run_check "ISORT --check-only" \
+  "\"$VENV_PY\" -m isort --check-only --diff src tests" \
+  "No isort issues found." \
+  "isort failed"
+
+run_check "BLACK --check" \
+  "\"$VENV_PY\" -m black --check --diff src tests" \
+  "No formatting changes needed by black." \
+  "black check failed"
+
+run_check "FLAKE8" \
+  "\"$VENV_PY\" -m flake8 src tests" \
+  "No flake8 issues found." \
+  "flake8 failed"
+
+[[ $FLAKE8_OK -eq 0 ]] && LINT_ACTIONS+="   [OK] flake8 passed" || { LINT_ACTIONS+="   ❌ flake8 failed"; EXIT_CODE=1; }
+
+[[ $EXIT_CODE -eq 0 ]] || LINT_STATUS="   ❌ One or more lint checks failed"
+
+bash scripts/shared/log-summary.sh \
+  --title "Lint Summary" \
+  --status "$LINT_STATUS" \
+  --actions "$LINT_ACTIONS" \
+  --output "logs/lint-summary.md"
+
+exit

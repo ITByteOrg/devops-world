@@ -4,33 +4,60 @@
 # Description : Auto-healing, remediation logic, or fallbacks.
 # ====================================================================
 
-# Load environment variables
+# Load .env overrides
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 else
   echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
 fi
 
-
-source venv/Scripts/activate || {
-  echo "❌ ERROR: Could not activate virtual environment."
-  exit 1
-}
+# Bootstrap environment
+source scripts/shared/bootstrap.sh
+source scripts/shared/check-core.sh
 
 export PYTHONPATH=src
+FIX_ACTIONS=()
+EXIT_CODE=0
 
-echo "🔧 Applying fixes..."
+echo "Applying fixes..."
 
-echo "↪️ Sorting imports with isort..."
-isort src tests
+run_step "Sorting imports" \
+  "\"$VENV_PY\" -m isort src tests" \
+  "Imports sorted with isort" \
+  "isort fix failed" \
+  "FIX_ACTIONS" \
+  "false"
 
-echo "🎨 Formatting code with black..."
-black src tests
+run_step "Formatting code with black" \
+  "\"$VENV_PY\" -m black src tests" \
+  "Code formatted with black" \
+  "black formatting failed" \
+  "FIX_ACTIONS" \
+  "false"
 
-echo "🧹 Re-running flake8 to check cleanliness..."
-flake8 src tests || {
-  echo "❌ Lint check failed after fixes."
-  exit 1
-}
+run_step "Re-running flake8 for cleanliness" \
+  "\"$VENV_PY\" -m flake8 src tests" \
+  "flake8 re-checked for cleanliness" \
+  "flake8 failed after fix" \
+  "FIX_ACTIONS" \
+  "false"
 
-echo "✅ Code formatted and lint passed."
+run_step "Normalizing line endings for PowerShell scripts" \
+  "find . -type f -name '*.ps1' -exec dos2unix {} +" \
+  "Line endings normalized for PowerShell scripts" \
+  "dos2unix failed on PowerShell scripts" \
+  "FIX_ACTIONS" \
+  "false"
+
+[[ $EXIT_CODE -eq 0 ]] && FIX_ACTIONS+=("[OK] Overall formatting and lint check passed")
+
+# Write Markdown summary
+FIX_STATUS="${STATUS:-[OK] All remediation steps completed successfully}"
+FIX_ACTIONS_JOINED=$(IFS=','; echo "${FIX_ACTIONS[*]}")
+bash scripts/shared/log-summary.sh \
+  --title "Fix Summary" \
+  --status "$FIX_STATUS" \
+  --actions "$FIX_ACTIONS_JOINED" \
+  --output "logs/fix-summary.md"
+
+exit $EXIT_CODE

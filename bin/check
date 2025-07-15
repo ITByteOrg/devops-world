@@ -1,48 +1,83 @@
 #!/usr/bin/env bash
 #====================================================================
 # CHECK
-# Description : Validation logic, preconditions, or integrity checks.
-# ====================================================================#>
+# Description : Comprehensive validation: style, security, tests, docs, lint, and pre-commit config.
+#====================================================================
 
-# Load environment variables
-if [ -f .env ]; then
-  export $(grep -v '^#' .env | xargs)
-else
-  echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
-fi
+source scripts/shared/bootstrap.sh
+source scripts/shared/check-core.sh
 
+STATUS="[OK] All checks passed"
+ACTIONS=()
+EXIT_CODE=0
 
-source venv/Scripts/activate || {
-  echo "✘ ERROR: Could not activate venv"
-  exit 1
-}
+echo "Running full validation..."
 
-export PYTHONPATH=src
+# --- Pre-commit hook presence check ---
+PRECOMMIT_FILE=".pre-commit-config.yaml"
 
-echo "🔎 Running full quality checks..."
-
-flake8_ok=1
-bandit_ok=1
-pytest_ok=1
-
-echo "🧹 flake8:"
-flake8 src tests && flake8_ok=0
-
-echo "🛡️ bandit:"
-bandit -r src && bandit_ok=0
-
-echo "🧪 pytest:"
-pytest "$@" && pytest_ok=0
-
-echo
-
-if [[ $flake8_ok -eq 0 && $bandit_ok -eq 0 && $pytest_ok -eq 0 ]]; then
-  echo "✅ All checks passed: flake8, bandit, pytest"
-else
-  echo "❌ One or more checks failed:"
-  [[ $flake8_ok -ne 0 ]] && echo "  - flake8"
-  [[ $bandit_ok -ne 0 ]] && echo "  - bandit"
-  [[ $pytest_ok -ne 0 ]] && echo "  - pytest"
+if [[ ! -f "$PRECOMMIT_FILE" ]]; then
+  echo ""
+  echo "Inspecting pre-commit hooks:"
+  echo "   [X] .pre-commit-config.yaml not found."
   exit 1
 fi
 
+echo ""
+echo "Inspecting pre-commit hooks..."
+missing_hooks=()
+
+for hook_id in flake8 black isort trufflehog-pwsh; do
+  if ! grep -q "$hook_id" "$PRECOMMIT_FILE"; then
+    missing_hooks+=("$hook_id")
+  fi
+done
+
+if [[ ${#missing_hooks[@]} -gt 0 ]]; then
+  echo "   [X] Missing pre-commit hooks:"
+  for h in "${missing_hooks[@]}"; do
+    echo "   - $h"
+  done
+  echo "Please ensure these are defined in .pre-commit-config.yaml"
+  exit 1
+else
+  echo "   [OK] All required pre-commit hooks are present."
+  ACTIONS+=("[OK] pre-commit hooks present")
+fi
+
+# --- Lint (delegated to bin/lint) ---
+run_check "LINT" \
+  "bash bin/lint" \
+  "Lint checks passed" \
+  "Lint validation failed"
+
+# Note: flake8 is run in bin/lint, so we don't need to run it again here.
+
+# --- Bandit Security Scan ---
+run_check "BANDIT" \
+  "bandit -r src" \
+  "No security issues detected by Bandit" \
+  "Bandit scan failed"
+  "true"  # quiet_supported
+
+# --- Pytest ---
+run_check "PYTEST" \
+  "pytest $@" \
+  "All tests passed" \
+  "pytest failed"
+
+# --- pre-commit-config.yaml validation ---
+run_check "Validate .pre-commit-config.yaml" \
+  "pre-commit validate-config .pre-commit-config.yaml" \
+  ".pre-commit-config.yaml is valid" \
+  "Invalid .pre-commit-config.yaml"
+
+# --- Write Summary ---
+ACTIONS_JOINED=$(IFS=','; echo "${ACTIONS[*]}")
+bash scripts/shared/log-summary.sh \
+  --title "Check Summary" \
+  --status "$STATUS" \
+  --actions "$ACTIONS_JOINED" \
+  --output "logs/check-summary.md"
+
+exit $EXIT_CODE

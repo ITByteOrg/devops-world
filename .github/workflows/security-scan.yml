@@ -32,15 +32,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install trufflehog==3.38.0 bandit
 
-      - name: Debug: list filesystem
-        run: ls -la
-
-      - name: Check TruffleHog Version
-        run: trufflehog --version
-
       - name: Run TruffleHog scan
-        run: |
-          trufflehog filesystem --directory . --json --exclude_paths_file .trufflehog-exclude.json
+        run: ./scripts/shared/trufflehog_wrapper.sh --log logs/trufflehog_scan.json
 
       - name: Run Bandit scan (optional for Python code security)
         run: |
@@ -50,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: trufflehog-results
-          path: trufflehog-results.json
+          path: logs/trufflehog_scan.json

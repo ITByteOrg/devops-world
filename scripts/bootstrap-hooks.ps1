@@ -11,63 +11,55 @@
     - Marks scripts executable on Unix systems
 #>
 
-$ErrorActionPreference = "Stop"
+# Resolve Git root
+$GitRoot = git rev-parse --show-toplevel 2>$null
+if (-not $GitRoot) {
+    Write-Host "Unable to resolve Git root. Are you inside a Git repo?"
+    exit 1
+}
 
-$RepoRoot       = Resolve-Path "$PSScriptRoot/.."
-$GitHooksDir    = "$RepoRoot/.git/hooks"
-$HookSourceDir  = "$RepoRoot/scripts/githooks"
-$SharedDir      = "$RepoRoot/scripts/shared"
+# Import logging utility
+$LoggingModule = Join-Path $GitRoot "scripts/shared/LoggingUtils.psm1"
+if (Test-Path $LoggingModule) {
+    Import-Module $LoggingModule -Force
+} else {
+    Write-Host "Logging module not found at $LoggingModule. Falling back to Write-Host."
+    function Write-Log { param([string]$Message, [string]$Severity = "Info") Write-Host "[$Severity] $Message" }
+}
 
-# Import shared modules
-Import-Module "$PSScriptRoot/shared/LoggingUtils.psm1" -ErrorAction Stop
-Import-Module "$PSScriptRoot/shared/TruffleHogShared.psm1" -ErrorAction Stop
+# Define paths
+$GitHooksDir    = Join-Path $GitRoot "scripts/githooks"
+$TargetHooksDir = Join-Path $GitRoot ".git/hooks"
 
-Write-Log "🔍 Verifying environment..." -Type "info"
+# Validate hook source directory
+if (-not (Test-Path $GitHooksDir)) {
+    Write-Log -Message "Hook source directory '$GitHooksDir' not found." -Type Error
+    exit 1
+}
 
-function Test-Tool($name, $command) {
-    if (-not (Get-Command $command -ErrorAction SilentlyContinue)) {
-        Write-Log "$name not found! Please install." -Type "error"
-        exit 1
-    } else {
-        Write-Log "$name found." -Type "ok"
+# Define hooks to install: source filename => target hook name
+$HookMap = @{
+    "pre-push.ps1"              = "pre-push"
+    "trufflehog-pre-commit.ps1" = "pre-commit"
+}
+
+Write-Log -Message "Installing hooks from '$GitHooksDir' to '$TargetHooksDir'" -Type Info
+
+foreach ($sourceFile in $HookMap.Keys) {
+    $sourcePath = Join-Path $GitHooksDir $sourceFile
+    $targetHook = Join-Path $TargetHooksDir $HookMap[$sourceFile]
+
+    if (-not (Test-Path $sourcePath)) {
+        Write-Log -Message "Missing source hook file: $sourceFile. Skipping." -Type Warning
+        continue
+    }
+
+    try {
+        Copy-Item -Path $sourcePath -Destination $targetHook -Force
+        Write-Log -Message "Installed $sourceFile as ${targetHook}" -Type Info
+    } catch {
+        Write-Log -Message "Failed to install ${targetHook}: $_" -Type Error
     }
 }
 
-Test-Tool "Git" "git"
-Test-Tool "Docker" "docker"
-Test-Tool "PowerShell Core" "pwsh"
-
-Write-Log "📂 Installing Git hooks..." -Type "info"
-
-# Discover *.ps1 hook scripts in the source directory
-$hookScripts = Get-ChildItem -Path $HookSourceDir -Filter *.ps1 -File
-
-foreach ($hook in $hookScripts) {
-    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($hook.Name)
-    $ps1Dest  = Join-Path $GitHooksDir "$baseName.ps1"
-    $shDest   = Join-Path $GitHooksDir $baseName
-
-    # Copy the PowerShell script
-    Copy-Item $hook.FullName $ps1Dest -Force
-    Write-Log "📦 Installed $baseName.ps1 to .git/hooks/" -Type "ok"
-
-    # Create the shell wrapper
-    $prefix = '#!/bin/sh'
-    $execCmd = 'exec pwsh "$(dirname "$0")/' + $baseName + '.ps1" "$@"'
-
-$wrapperContent = @"
-$prefix
-$execCmd
-"@
-
-    Set-Content -Path $shDest -Value $wrapperContent -Encoding UTF8
-    Write-Log "🔧 Created wrapper: $baseName → $baseName.ps1" -Type "ok"
-
-    # Make the wrapper executable (Unix only)
-    if ($IsLinux -or $IsMacOS) {
-        & chmod +x $shDest
-        Write-Log "🔑 Marked $baseName as executable on Unix." -Type "ok"
-    }
-}
-
-Write-Log "🎯 All Git hooks installed and ready." -Type "info"
+Write-Log -Message "Git hooks installed successfully." -Type Success

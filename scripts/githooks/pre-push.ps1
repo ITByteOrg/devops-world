@@ -11,8 +11,6 @@
 
 $ErrorActionPreference = 'Stop'
 
-$ErrorActionPreference = 'Stop'
-
 # Resolve repo root (based on this file’s path)
 $scriptPath = $MyInvocation.MyCommand.Path
 if (-not $scriptPath) {

@@ -1,187 +1,134 @@
 # DevOps World
 
-Welcome to **DevOps World**, a simple Python application designed to be tested and deployed through a complete **DevOps workflow**. This repository focuses on the application, including setup, dependencies, and basic usage.
+A modular DevOps toolkit for validating code quality, automating remediation, and enforcing documentation hygiene across cross-platform environments. Designed to support onboarding, repeatable workflows, and CI integration.
 
 ---
 
 ## Overview
-This repository contains a simple Python application slightly more interesting than "Hello World". In this journey, I'm focusing on the DevOps stack. This repo is only for the application, as separate repos were set up for infrastructure, security, and monitoring configurations. As the project progresses, the repository links below will expand with details on cloud deployment, CI/CD pipelines, security scanning, and monitoring practices.
 
-- **DevOps Infrastructure:** [`devops-infra`](https://github.com/ITByteOrg/devops-infra/blob/main/README.md)  
-- **DevOps Security:** [`devops-security`](https://github.com/ITByteOrg/devops-security/blob/main/README.md)  
-- **DevOps Monitoring:** To Be Created  
+This repository provides reusable scripts and validation tools for:
 
----
-
-## Getting Started
-
-### Prerequisites
-You’ll want a dependable tool for editing and managing your files — modern IDEs make that process much more efficient. While it's technically possible to build everything using something like Notepad, modern IDEs offer far more—integrated debugging, IntelliSense, and a smoother development experience overall. There are excellent open-source options, so explore a few and choose one that suits your workflow.
-
-Here's what I used
-- Visual Studio Code (or any IDE that supports the latest version of Python)
-- Python (latest version recommended)
-- pip (for dependency management)  
-- Git (to clone the repository)
-- Obsidian - started using this for markdown editing, but decided VS Code is enough for my needs and fits my workflow better.    
-
-### Installation
-
-#### 1. Clone repo
-
-Clone the repository and move into the project directory
-
-```bash
-git clone https://github.com/yourusername/devops-world.git
-cd devops-world
-```
-
-#### 2. Install Python (If Not Installed)
-
-- **Windows:**
-  1. Download Python from [python.org](https://www.python.org/).
-  2. Run the installer and **check the box to add Python to PATH**.
-  3. Verify installation:
-     ```powershell
-     python --version
-     ```
-    
-- **Mac/Linux:**
-  1. Install Python via your package manager:
-     ```bash
-     brew install python  # macOS
-     sudo apt install python3  # Debian/Ubuntu
-     ```
-  2. Verify installation:
-     ```bash
-     python3 --version
-     ```
-
-#### 3. Set Up a Virtual Environment
-
-Create and activate a virtual environment to isolate dependencies:
-
-- **Windows:**
-  ```powershell
-  python -m venv venv
-  .\venv\Scripts\activate
-  ```
-> If `python` doesn't work, try `py -m venv venv`.
-
-- **Mac/Linux:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-■ _You'll know it's activated when you see_ `(venv)` _in your terminal._
-
-#### 4. Install Dependencies
-
-Install all required Python packages using:
-
-```bash
-pip install -r requirements.txt
-```
-
-> **Note:** All required Python packages (including Flask) will be installed automatically from `requirements.txt`. You do not need to install them individually.
+- Auto-remediating common formatting and lint errors
+- Enforcing security and style checks across Python code
+- Running consistent test suites
+- Validating markdown documentation hygiene
+- Activating shared pre-commit rules
+- Centralizing environment setup and logging behaviors
 
 ---
-## Run the Application
 
-Start the Flask app with:
-
-```bash
-python src/app.py
-```
-> If `python` doesn't work, try `python3 app.py`.
-
-In your browser, navigate to **http://127.0.0.1:5000/** to see the running app.
-
-To stop the server, press `Ctrl+C` in the terminal.
-
-_Tip: You can use the integrated terminal in Visual Studio Code for all commands above._
-
----
 ## Repository Structure
 
-This section provides a high-level view of the application directory structure. As the CI/CD stack takes shape, I anticipate breaking out iss_service.py into a dedicated microservice for improved modularity. Initially, src/ and templates/ were placed at the top level. But as the project matured, I moved templates/ under src/ to better align with Flask’s organizational conventions and keep app-specific logic and views together. (And yes—templates/index.html will be removed soon... possibly before anyone reads this.)
-
 ```
-devops-world/
-│── .github/
-│   └── workflows/
-│       └── security_scan.yml  # GitHub Actions workflow for security scanning
-│       └── docker-build.yml   
-│       └── ci-dev.yml
-│── requirements.txt    # Python dependencies
-│── README.md           # Project documentation
-│── .gitignore          # Git ignore rules
-│── src/                # Application source code
-│   ├── app.py          # Main application script
-│   └── iss_service.py  # API call to location of ISS
-│── config/             # Configuration files (YAML, etc.)
-│── templates/          # HTML templates for Flask
-│── Dockerfile          # docker build
+├── bin/                       # Command-line scripts for fix, lint, and check
+├── scripts/shared/           # Utilities for bootstrapping and summary logging
+├── src/                      # Source code
+├── tests/                    # Pytest-compatible test suite
+├── setup.sh                  # Developer onboarding script
+├── requirements.txt          # Runtime dependencies
+├── requirements-dev.txt      # Development dependencies (flake8, pytest, etc.)
 ```
 
 ---
-## CI/CD Workflows Overview
 
-This project uses a modular GitHub Actions setup to enforce code quality, validate infrastructure, and streamline delivery across environments. Each `.yml` workflow is purpose-built for clarity and separation of concerns:
+## Installation
 
-<details>
-<summary><strong>ci-dev.yml</strong> — Python Dev Validation</summary>
+To set up all required Python packages and system tools:
 
-Validates Python code on development branches and pull requests. Runs:
-- Linting with Flake8
-- Security scans with Bandit
-- Tests via Pytest
-- Secret scanning using TruffleHog
+```bash
+./setup.sh
+```
 
-</details>
+To rebuild the virtual environment and reinstall everything:
 
-<details>
-<summary><strong>docker-dev.yml</strong> — Docker Quality Gate</summary>
+```bash
+./setup.sh --force
+```
 
-Lint-checks and builds Docker images on dev-style branches (`feature/*`, `hotfix/*`, `release/*`) without pushing. Keeps Dockerfiles validated early in the cycle.
-
-</details>
-
-<details>
-<summary><strong>pr-validation.yml</strong> — Pull Request Docker Checks</summary>
-
-Lint-checks and builds Docker images for all PRs targeting `main`. Uses Hadolint and build testing for early-stage validation.
-
-</details>
-
-<details>
-<summary><strong>docker-release.yml</strong> — Production Push</summary>
-
-Builds and pushes Docker images to DockerHub from `main` and `release/*` branches. Includes tagging, login, and secure push pipelines.
-
-</details>
+This script activates `.venv`, installs runtime and development packages, and ensures required tools like Docker and `jq` are available.
 
 ---
-## Debug Utilities
-Manual GitHub Actions for branch logic + context inspection  
-→ [See debug workflows](.github/workflows/README.md)
+
+## Tooling Scripts
+
+| Script       | Description                                                 |
+|--------------|-------------------------------------------------------------|
+| `bin/fix`    | Formats code using `black`, sorts imports using `isort`, and runs `flake8` to verify cleanliness. |
+| `bin/lint`   | Performs non-destructive checks using `isort --check-only`, `black --check`, and `flake8`. |
+| `bin/check`  | Runs full validation including `lint`, `bandit`, `pytest`, and pre-commit config inspection. |
+| `bootstrap.sh` | Loads environment variables, activates virtualenv cross-platform, and sets `PYTHONPATH`. |
+| `log-summary.sh` | Writes structured markdown logs in `/logs` reflecting scan outcomes. |
 
 ---
-## Next Step
 
-After setting up the repositories and scaffolding the application, I focused on establishing a strong CI/CD framework. Although the order suited this exploratory build, I’d reverse it in a production context by starting with a robust CI/CD pipeline. Laying that foundation early promotes good engineering hygiene by enforcing automated scans, pull request gates, and approval workflows before anything lands in main. As I continue to build out the project, I will likely reorder these pages, but for now, the journey continues. My next stop in the journey was devops-infra for the Terraform setup. 
+## Validation Workflow
+
+To run the complete validation suite, use:
+
+```bash
+make check
+```
+
+This is the **all-in-one entrypoint** for contributors and CI pipelines. It performs:
+
+- Linting and formatting verification (`bin/lint`)
+- Static analysis (`flake8`) and security scanning (`bandit`)
+- Test execution via `pytest`
+- Pre-commit configuration inspection
+- Structured summary logging in `logs/check-summary.md`
+
+No separate `validate` target is required. This command ensures the codebase meets all quality, security, and configuration standards before commit or deployment.
+
+To apply auto-remediation before running checks:
+
+```bash
+# Recommended workflow before commit
+make fix     # Apply formatting and cleanup
+make check   # Run full validation suite
+```
+---
+### Pre-commit Hooks
+
+Code formatting, linting, and secret scanning are enforced via `pre-commit` hooks. These run automatically before each commit.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md#pre-commit-configuration) for full setup instructions and hook definitions.
 
 ---
-## License
-This project is licensed under **Creative Commons Attribution 4.0 International License (CC-BY-4.0).**  
-🔗 **Full license details:** [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)
 
-## Contributing
+## Dependencies
 
-While this project is publicly available under an open license, contributions are currently not being accepted.
+Ensure your system has:
 
-You're welcome to use, fork, or adapt the scripts for your infrastructure work. If you find them helpful, a star or mention is always appreciated.
+- Python 3.8 or later
+- Docker (for TruffleHog and future workflows)
+- GNU Make (install via `sudo apt install make`)
+- PowerShell Core (required for `.ps1` scripts)
+- `jq` (automatically installed via `setup.sh` on supported systems)
 
-## Maintainer
-Developed and maintained by ITByteEnthusiast.
+---
+
+## Sample Output
+
+A successful validation will produce a summary like the following in `logs/check-summary.md`:
+
+```markdown
+# Check Summary
+
+Status: ✅ All checks passed
+
+Actions Performed:
+- lint passed
+- flake8 passed
+- bandit passed
+- pytest passed
+- pre-commit config valid
+
+Metadata:
+- Branch: feature
+- Commit: abc1234
+- Timestamp: 2025-07-14 21:22 EDT
+```
+
+This log can be used in CI or audits to confirm tooling results.
+
+---

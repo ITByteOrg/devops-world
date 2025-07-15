@@ -10,8 +10,8 @@ venv/
 __pycache__/
 
 # Logs & Temporary files
-*.log
-*.cache
+logs/
+!logs/.keep
 
 # Environment variables / secrets
 .env
@@ -36,3 +36,9 @@ gunicorn.pid
 
 # no program like trufflehog etc
 *.exe
+
+# Coverage binary files
+.coverage
+htmlcov/
+coverage.xml
+coverage.json
