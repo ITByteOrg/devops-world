@@ -11,13 +11,8 @@
 
 $ErrorActionPreference = 'Stop'
 
-# Resolve repo root (based on this file’s path)
-$scriptPath = $MyInvocation.MyCommand.Path
-if (-not $scriptPath) {
-    Write-Error "❌ Could not determine script path. This script may not be running in a file-bound context."
-    exit 1
-}
-
+# Dynamically set repo root
+$scriptRoot = (& git rev-parse --show-toplevel).Trim()
 $scriptRoot = Split-Path -Parent $scriptPath
 $repoRoot   = Resolve-Path "$scriptRoot/../.."
 $sharedPath = Join-Path $repoRoot "scripts/shared"
