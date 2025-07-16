@@ -41,6 +41,12 @@ jobs:
           chmod +x trufflehog
           ./trufflehog --version
 
+      - name: Run TruffleHog scan
+        run: |
+          chmod +x scripts/trufflehog.exe
+          ./scripts/trufflehog.exe --version
+          ./scripts/trufflehog.exe github --repo https://github.com/ITByteOrg/devops-world --exclude-path .trufflehogignore
+
       - name: Lint code
         # Only lint existing folders
         run: flake8 --config=.flake8 $(find src config tests -type d -maxdepth 0 2>/dev/null)
