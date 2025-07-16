@@ -24,9 +24,17 @@ def get_iss_location():
         response = requests.get(ISS_API_URL, timeout=5)
         response.raise_for_status()
         data = response.json()
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
+        altitude = data.get("altitude")
+        velocity = data.get("velocity")
+        visibility = data.get("visibility")
+
+        if latitude is None or longitude is None:
+            raise KeyError("Missing keys in response JSON")
 
         logging.info(
-            f"ISS Location: {data['latitude']}, {data['longitude']}"
+            f"ISS Location: {latitude}, {longitude}, {altitude}, {velocity}, {visibility}"
         )  # Log coordinates
         return data
 

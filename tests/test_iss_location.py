@@ -6,6 +6,8 @@ import pytest
 
 from src.app import app
 
+# from unittest.mock import patch
+
 # Ensure the src directory is in the path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -45,3 +47,10 @@ def test_iss_location_failure(client, monkeypatch):
     data = response.get_json()
 
     assert "error" in data
+
+
+def test_home_route_loads():
+    client = app.test_client()
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"<title>Bytes & Pipelines</title>" in response.data
