@@ -35,17 +35,19 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 bandit pytest
 
-          # Skip pip install trufflehog — not on PyPI for v3+
-          # Download TruffleHog binary directly
-          curl -L https://github.com/trufflesecurity/trufflehog/releases/download/v3.38.0/trufflehog-linux -o trufflehog
+          # Download the correct Linux binary
+          curl -L https://github.com/trufflesecurity/trufflehog/releases/download/v3.89.2/trufflehog-linux -o trufflehog
+
+          # Verify it's a binary and not an HTML error
+          file trufflehog | grep 'ELF' || { echo "❌ Invalid binary. Download failed."; exit 1; }
+
           chmod +x trufflehog
-          ./trufflehog --version
+          mv trufflehog /usr/local/bin/trufflehog
 
       - name: Run TruffleHog scan
-        run: |
-          chmod +x scripts/trufflehog.exe
-          ./scripts/trufflehog.exe --version
-          ./scripts/trufflehog.exe github --repo https://github.com/ITByteOrg/devops-world --exclude-path .trufflehogignore
+          run: |
+            trufflehog --version
+            trufflehog github --repo https://github.com/ITByteOrg/devops-world --exclude-path .trufflehogignore
 
       - name: Lint code
         # Only lint existing folders
