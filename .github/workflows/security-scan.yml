@@ -43,8 +43,9 @@ jobs:
           file /usr/local/bin/trufflehog | grep 'ELF' || { echo "❌ Invalid binary. Download failed."; exit 1; }
 
       - name: Run TruffleHog scan
+        chmod +x ./scripts/shared/trufflehog-wrapper.sh
         run: ./scripts/shared/trufflehog-wrapper.sh --log logs/trufflehog-scan.json
-
+        
       - name: Run Bandit scan (optional for Python code security)
         run: |
           bandit -r .
