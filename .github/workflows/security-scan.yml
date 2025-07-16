@@ -30,7 +30,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install trufflehog==3.38.0 bandit
+          pip install -r requirements.txt
+          pip install flake8 bandit pytest
+
+          # Download the correct Linux binary for TruffleHog v3.89.2
+          curl -L https://github.com/trufflesecurity/trufflehog/releases/download/v3.89.2/trufflehog-linux -o trufflehog
+
+          # Confirm it’s a valid executable
+          file trufflehog | grep 'ELF' || { echo "❌ Invalid binary. Download failed."; exit 1; }
+
+          chmod +x trufflehog
+          mv trufflehog /usr/local/bin/trufflehog
 
       - name: Run TruffleHog scan
         run: ./scripts/shared/trufflehog_wrapper.sh --log logs/trufflehog_scan.json
