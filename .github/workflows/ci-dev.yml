@@ -35,6 +35,12 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 bandit pytest
 
+          # Skip pip install trufflehog — not on PyPI for v3+
+          # Download TruffleHog binary directly
+          curl -L https://github.com/trufflesecurity/trufflehog/releases/download/v3.38.0/trufflehog-linux -o trufflehog
+          chmod +x trufflehog
+          ./trufflehog --version
+
       - name: Lint code
         # Only lint existing folders
         run: flake8 --config=.flake8 $(find src config tests -type d -maxdepth 0 2>/dev/null)
