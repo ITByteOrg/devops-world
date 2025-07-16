@@ -24,18 +24,10 @@ function Resolve-ModulePath {
         [string]$ModuleName,
         [string]$BaseDir
     )
-    Write-Host "    ModuleName: '$ModuleName'"
-    Write-Host "🔍 Entered Resolve-ModulePath with BaseDir: '$BaseDir'"
-
     if (-not $BaseDir) {
         Write-Host "❌ Resolve-ModulePath: BaseDir is null or empty."
         return $null
     }
-
-    Write-Host "🧪 Joining path using:"
-    Write-Host "    BaseDir:    '$BaseDir'"
-    Write-Host "    ModuleName: '$ModuleName'"
-
     # Wrap it with a null check
     if (-not $BaseDir) {
         Write-Host "⚠️ BaseDir is null before BaseDir concat."
@@ -43,8 +35,6 @@ function Resolve-ModulePath {
     }
 
     $RawPath = "$BaseDir/scripts/shared/$ModuleName"
-    Write-Host "🧪 RawPath generated: $RawPath"
-
     if (-not (Test-Path $RawPath)) {
         Write-Host "❌ Resolve-ModulePath: Module not found at path: $RawPath"
         return $null
