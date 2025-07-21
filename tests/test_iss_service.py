@@ -17,7 +17,7 @@ def test_get_iss_location_success(monkeypatch):
     monkeypatch.setattr(requests, "get", lambda url, timeout=5: FakeResponse())
 
     result = src.iss_service.get_iss_location()
-    assert result == {"latitude": 10.0, "longitude": 20.0} # noqa: B101
+    assert result == {"latitude": 10.0, "longitude": 20.0}
 
 
 def test_get_iss_location_http_error(monkeypatch):
@@ -36,7 +36,7 @@ def test_get_iss_location_http_error(monkeypatch):
     assert result == {
         "error": "Failed to fetch ISS data",
         "details": "500 Internal Server Error",
-    } # noqa: B101
+    }
 
 
 def test_get_iss_location_bad_json(monkeypatch):

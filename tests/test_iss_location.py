@@ -31,11 +31,11 @@ def test_iss_location_success(client, monkeypatch):
     monkeypatch.setattr("src.app.get_iss_location", lambda: mock_iss_data)
 
     response = client.get("/iss-location")
-    assert response.status_code == 200 # noqa: B101
+    assert response.status_code == 200
     data = response.get_json()
 
-    assert data["latitude"] == 10.0 # noqa: B101
-    assert data["altitude_mi"] == round(420.0 * 0.621371, 2) # noqa: B101
+    assert data["latitude"] == 10.0
+    assert data["altitude_mi"] == round(420.0 * 0.621371, 2)
 
 
 def test_iss_location_failure(client, monkeypatch):
@@ -43,14 +43,14 @@ def test_iss_location_failure(client, monkeypatch):
     monkeypatch.setattr("src.app.get_iss_location", lambda: None)
 
     response = client.get("/iss-location")
-    assert response.status_code == 500 # noqa: B101
+    assert response.status_code == 500
     data = response.get_json()
 
-    assert "error" in data # noqa: B101
+    assert "error" in data
 
 
 def test_home_route_loads():
     client = app.test_client()
     response = client.get("/")
-    assert response.status_code == 200 # noqa: B101
-    assert b"<title>Bytes & Pipelines</title>" in response.data # noqa: B101
+    assert response.status_code == 200
+    assert b"<title>Bytes & Pipelines</title>" in response.data
