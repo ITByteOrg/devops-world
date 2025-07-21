@@ -1,11 +1,30 @@
 #!/usr/bin/env bash
+# -----------------------------------------------------------------------------
+# File: bootstrap.sh
+# Purpose: Prepares the local environment for Bash-based workflows.
+#
+# Responsibilities:
+#   - Loads environment variables from .env (if present)
+#   - Activates the Python virtual environment (.venv)
+#   - Detects the correct Python executable inside .venv
+#   - Sets PYTHONPATH=src for module resolution
+#
+# This script ensures a consistent runtime state before running tools
+# like linting, TruffleHog scans, or hook wrappers from Bash.
+#
+# Usage:
+#   source scripts/shared/bootstrap.sh
+# -----------------------------------------------------------------------------
 
+# load shared-utils
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../modules/shared-utils.sh"
 
 # Load environment variables
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 else
-  echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
+  echo-StdLog "⚠️  Warning: .env file not found. Continuing without environment overrides." warn
 fi
 
 # Cross-platform .venv activation
@@ -14,7 +33,7 @@ if [ -f ".venv/bin/activate" ]; then
 elif [ -f ".venv/Scripts/activate" ]; then
   source .venv/Scripts/activate
 else
-  echo "❌ ERROR: Could not activate .venv"
+  echo-StdLog "❌ ERROR: Could not activate .venv" error
   exit 1
 fi
 
@@ -24,7 +43,7 @@ if [ -x ".venv/bin/python" ]; then
 elif [ -x ".venv/Scripts/python.exe" ]; then
   export VENV_PY=".venv/Scripts/python.exe"
 else
-  echo "❌ ERROR: Could not find .venv Python"
+  echo-StdLog "❌ ERROR: Could not find .venv Python" error
   exit 1
 fi
 

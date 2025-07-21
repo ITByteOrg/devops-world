@@ -11,43 +11,38 @@
     - Marks scripts executable on Unix systems
 #>
 
-# Resolve Git root
-$GitRoot = git rev-parse --show-toplevel 2>$null
-if (-not $GitRoot) {
-    Write-Host "Unable to resolve Git root. Are you inside a Git repo?"
+# figure out where the repo lives 
+$gitRoot = (& { git rev-parse --show-toplevel 2>$null }).Trim()
+$moduleBase = Join-Path $gitRoot "scripts/modules"
+$sharedUtilsPath = Join-Path $moduleBase "shared-utils.psm1"
+
+if (-not (Test-Path $sharedUtilsPath)) {
+    Write-StdLog "Module file not found at path: $sharedUtilsPath", -Type "error"
     exit 1
 }
 
-# Import logging utility
-$LoggingModule = Join-Path $GitRoot "scripts/shared/LoggingUtils.psm1"
-if (Test-Path $LoggingModule) {
-    Import-Module $LoggingModule -Force
-} else {
-    Write-Host "Logging module not found at $LoggingModule. Falling back to Write-Host."
-    function Write-Log { param([string]$Message, [string]$Severity = "Info") Write-Host "[$Severity] $Message" }
-}
-
 # Define paths
-$GitHooksDir    = Join-Path $GitRoot "scripts/githooks"
-$TargetHooksDir = Join-Path $GitRoot ".git/hooks"
+$gitHooksDir    = Join-Path $gitRoot "scripts/hooks"
+$targetHooksDir = Join-Path $gitRoot ".git/hooks"
 
 # Validate hook source directory
-if (-not (Test-Path $GitHooksDir)) {
-    Write-Log -Message "Hook source directory '$GitHooksDir' not found." -Type Error
+if (-not (Test-Path $gitHooksDir)) {
+    Write-Log -Message "Hook source directory '$gitHooksDir' not found." -Type Error
     exit 1
 }
 
 # Define hooks to install: source filename => target hook name
-$HookMap = @{
+$hookMap = @{
+    "pre-commit.ps1"            = "pre-commit"
     "pre-push.ps1"              = "pre-push"
-    "trufflehog-pre-commit.ps1" = "pre-commit"
+    "post-checkout.ps1"         = "post-checkout"
 }
 
-Write-Log -Message "Installing hooks from '$GitHooksDir' to '$TargetHooksDir'" -Type Info
+Write-Log -Message "Installing hooks from '$gitHooksDir' to '$targetHooksDir'" -Type Info
 
-foreach ($sourceFile in $HookMap.Keys) {
-    $sourcePath = Join-Path $GitHooksDir $sourceFile
-    $targetHook = Join-Path $TargetHooksDir $HookMap[$sourceFile]
+foreach ($sourceFile in $hookMap.Keys) {
+    $sourcePath = Join-Path $gitHooksDir $sourceFile
+    $targetHook = Join-Path $targetHooksDir $hookMap[$sourceFile]
 
     if (-not (Test-Path $sourcePath)) {
         Write-Log -Message "Missing source hook file: $sourceFile. Skipping." -Type Warning

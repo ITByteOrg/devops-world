@@ -8,6 +8,7 @@ name: Docker Dev
 on:
   push:
     branches:
+      - main
       - feature/*
       - hotfix/*
       - release/*

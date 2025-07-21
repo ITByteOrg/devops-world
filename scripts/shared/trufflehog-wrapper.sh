@@ -28,6 +28,8 @@
 # --------------------------------------------------------------------
 
 set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../modules/shared-utils.sh"
 
 # Default values
 SCAN_DIR="/pwd"
@@ -46,24 +48,24 @@ while [[ $# -gt 0 ]]; do
     --dir) shift; SCAN_DIR="$1" ;;
     --exclude) shift; EXCLUDE_FILE="$1" ;;
     --log) shift; LOG_FILE="$1" ;;
-    *) echo "Unknown argument: $1"; exit 1 ;;
+    *) echo-StdLog "Unknown argument: $1" error; exit 1 ;;
   esac
   shift
 done
 
 # Verbose output
 if [[ "$VERBOSE" == "true" ]]; then
-  echo "=== TruffleHog Wrapper ==="
-  echo "Scan Directory: $SCAN_DIR"
-  echo "Exclude File:   $EXCLUDE_FILE"
-  echo "Docker Image:   $TRUFFLEHOG_IMAGE"
-  echo "Dry Run:        $DRY_RUN"
-  [[ -n "$LOG_FILE" ]] && echo "Log File:       $LOG_FILE"
+  echo-StdLog "=== TruffleHog Wrapper ===" raw
+  echo-StdLog "Scan Directory: $SCAN_DIR" raw
+  echo-StdLog "Exclude File:   $EXCLUDE_FILE" raw
+  echo-StdLog "Docker Image:   $TRUFFLEHOG_IMAGE" raw
+  echo-StdLog "Dry Run:        $DRY_RUN" raw
+  [[ -n "$LOG_FILE" ]] && echo-StdLog "Log File:       $LOG_FILE" info
 fi
 
 # Validate exclude file exists
 if [[ ! -f "$(pwd)/$(basename "$EXCLUDE_FILE")" ]]; then
-  echo "Error: Exclude file not found: $EXCLUDE_FILE"
+  echo-StdLog "[Error] Exclude file not found: $EXCLUDE_FILE" error
   exit 1
 fi
 
@@ -71,38 +73,47 @@ mkdir -p "$PWD/logs"
 
 # Dry run preview
 if [[ "$DRY_RUN" == "true" ]]; then
-  echo "--- Dry Run ---"
-  echo "Would execute:"
-  echo "docker run --rm -v \"\$PWD:/pwd\" --entrypoint trufflehog $TRUFFLEHOG_IMAGE filesystem \"$SCAN_DIR\" --exclude_paths \"$EXCLUDE_FILE\" --json"
-  [[ -n "$LOG_FILE" ]] && echo "Output would be logged to: $LOG_FILE"
+  echo-StdLog "--- Dry Run ---" info
+  echo-StdLog "Would execute:" info
+  echo-StdLog "docker run --rm -v \"\$PWD:/pwd\" --entrypoint trufflehog $TRUFFLEHOG_IMAGE filesystem \"$SCAN_DIR\" --exclude_paths \"$EXCLUDE_FILE\" --json" info
+  [[ -n "$LOG_FILE" ]] && echo-StdLog "Output would be logged to: $LOG_FILE" info
   exit 0
 fi
 
-# Run scan and capture output
 docker run --rm -v "$PWD:/pwd" \
   --entrypoint trufflehog \
   "$TRUFFLEHOG_IMAGE" \
   filesystem "$SCAN_DIR" \
   --exclude_paths "$EXCLUDE_FILE" \
   --json \
-  > "$RAW_OUTPUT"
+  > "$RAW_OUTPUT" 2> logs/trufflehog_error.log
 
 # Optional file logging
 if [[ -n "$LOG_FILE" && "$RAW_OUTPUT" != "$LOG_FILE" ]]; then
   cp "$RAW_OUTPUT" "$LOG_FILE"
 else
-  echo "Skipping redundant copy — log file already in target location"
+  echo-StdLog "Skipping redundant copy — log file already in target location" info
 fi
 
+# if file in $RAW_OUTPUT exists and size gt 0
 if [[ -s "$RAW_OUTPUT" ]]; then
-  UNVERIFIED=$(jq '[.[] | select(.verified==false)] | length' "$RAW_OUTPUT")
-  VERIFIED=$(jq '[.[] | select(.verified==true)] | length' "$RAW_OUTPUT")
+  
+  # does not have valid JSON
+  if ! jq empty "$RAW_OUTPUT" &>/dev/null; then
+    echo "--- Summary ---" > logs/trufflehog_summary.txt
+    echo "[ERROR] Scan output is malformed or empty." >> logs/trufflehog_summary.txt
+    echo "![Secrets](https://img.shields.io/badge/TruffleHog_Scan_Failed-red)" > logs/trufflehog_badge.md
+    exit 1
+  else # contains valid JSON
+    UNVERIFIED=$(jq '[.[] | select(.verified==false)] | length' "$RAW_OUTPUT")
+    VERIFIED=$(jq '[.[] | select(.verified==true)] | length' "$RAW_OUTPUT")
 
-  echo "--- Summary ---"
-  echo "Verified: $VERIFIED" > logs/trufflehog_summary.txt
-  echo "Unverified: $UNVERIFIED" >> logs/trufflehog_summary.txt
-  echo "![Secrets](https://img.shields.io/badge/Unverified_$UNVERIFIED-red)" > logs/trufflehog_badge.md
-else
+    echo "--- Summary ---" > logs/trufflehog_summary.txt
+    echo "Verified: $VERIFIED" > logs/trufflehog_summary.txt
+    echo "Unverified: $UNVERIFIED" >> logs/trufflehog_summary.txt
+    echo "![Secrets](https://img.shields.io/badge/Unverified_$UNVERIFIED-red)" > logs/trufflehog_badge.md
+  fi
+else  # file doesn't exist
   echo "--- Summary ---" > logs/trufflehog_summary.txt
   echo "[OK] No secrets found. Scan output file is empty." >> logs/trufflehog_summary.txt
   echo "![Secrets](https://img.shields.io/badge/Unverified_0-green)" > logs/trufflehog_badge.md

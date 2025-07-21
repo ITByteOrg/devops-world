@@ -4,27 +4,30 @@
 # Description : Comprehensive validation: style, security, tests, docs, lint, and pre-commit config.
 #====================================================================
 
+# Load shared utilities
+source modules/shared-utils.sh
 source scripts/shared/bootstrap.sh
 source scripts/shared/check-core.sh
+
 
 STATUS="[OK] All checks passed"
 ACTIONS=()
 EXIT_CODE=0
 
-echo "Running full validation..."
+echo-StdLog "Running full validation..." raw
 
 # --- Pre-commit hook presence check ---
 PRECOMMIT_FILE=".pre-commit-config.yaml"
 
 if [[ ! -f "$PRECOMMIT_FILE" ]]; then
-  echo ""
-  echo "Inspecting pre-commit hooks:"
-  echo "   [X] .pre-commit-config.yaml not found."
+  echo-StdLog "" 
+  echo-StdLog "Inspecting pre-commit hooks:" raw
+  echo-StdLog "   [ERROR].pre-commit-config.yaml not found." error
   exit 1
 fi
 
-echo ""
-echo "Inspecting pre-commit hooks..."
+echo-StdLog "" 
+echo-StdLog "Inspecting pre-commit hooks..." raw
 missing_hooks=()
 
 for hook_id in flake8 black isort trufflehog-pwsh; do
@@ -34,14 +37,14 @@ for hook_id in flake8 black isort trufflehog-pwsh; do
 done
 
 if [[ ${#missing_hooks[@]} -gt 0 ]]; then
-  echo "   [X] Missing pre-commit hooks:"
+  echo-StdLog "   [ERROR] Missing pre-commit hooks:" error
   for h in "${missing_hooks[@]}"; do
     echo "   - $h"
   done
-  echo "Please ensure these are defined in .pre-commit-config.yaml"
+  echo-StdLog "Please ensure these are defined in .pre-commit-config.yaml" raw
   exit 1
 else
-  echo "   [OK] All required pre-commit hooks are present."
+  echo-StdLog "   All required pre-commit hooks are present." success
   ACTIONS+=("[OK] pre-commit hooks present")
 fi
 

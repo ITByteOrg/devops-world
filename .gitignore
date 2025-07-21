@@ -21,6 +21,9 @@ logs/
 *.pyo
 *.pyd
 
+# tar
+*.tar.gz
+
 # Gunicorn socket & PID files (if used)
 gunicorn.sock
 gunicorn.pid

@@ -2,6 +2,10 @@
 # check-core.sh — Shared step execution utilities
 
 run_step() {
+
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  source "$SCRIPT_DIR/../modules/shared-utils.sh"
+  
   local label="$1"
   local cmd="$2"
   local ok_msg="$3"
@@ -9,8 +13,8 @@ run_step() {
   local action_list="$5"  # e.g., ACTIONS or FIX_ACTIONS
   local quiet="$6"
 
-  echo ""
-  echo "${label}:"
+  echo-StdLog ""
+  echo-StdLog "${label}:" raw
 
   [[ "$quiet" == "true" ]] && cmd="$cmd -q"
 
@@ -21,12 +25,12 @@ run_step() {
   [[ -n "$output" ]] && echo "$output"
 
   if [[ $status -eq 0 ]]; then
-    echo "[OK] $ok_msg"
+    echo-StdLog "[OK] $ok_msg" success
     eval "$action_list+=(\"[OK] $label\")"
   else
-    echo "[X] $fail_msg"
+    echo-StdLog  "[ERROR] $fail_msg"
     eval "$action_list+=(\"[X] $label\")"
-    STATUS="[X] One or more steps failed"
+    STATUS="[ERROR] One or more steps failed"
     EXIT_CODE=1
   fi
 }

@@ -5,22 +5,21 @@
 # ====================================================================
 
 # Load shared utilities
+source modules/shared-utils.sh
+source scripts/shared/bootstrap.sh
 source scripts/shared/lint-utils.sh
 
 # Load environment variables
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 else
-  echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
+  echo-StdLog "Warning: .env file not found. Continuing without environment overrides." warn
 fi
 
-# Activate venv (cross-platform)
-source scripts/shared/bootstrap.sh
-
-echo "Running flake8 via venv..."
+echo-StdLog "Running flake8 via venv..." raw
 "$VENV_PY" -m flake8 src tests
 FLAKE8_VENV_OK=$?
-[[ $FLAKE8_VENV_OK -eq 0 ]] || echo "❌ flake8 (venv) failed"
+[[ $FLAKE8_VENV_OK -eq 0 ]] || echo-StdLog "[ERROR] flake8 (venv) failed" error
 
 LINT_STATUS="   [OK] All lint checks passed"
 LINT_ACTIONS=""

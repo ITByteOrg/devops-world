@@ -11,7 +11,8 @@ else
   echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
 fi
 
-# Bootstrap environment
+# Load shared utilities
+source modules/shared-utils.sh
 source scripts/shared/bootstrap.sh
 source scripts/shared/check-core.sh
 
@@ -19,7 +20,7 @@ export PYTHONPATH=src
 FIX_ACTIONS=()
 EXIT_CODE=0
 
-echo "Applying fixes..."
+echo-StdLog "Applying fixes..." raw
 
 run_step "Sorting imports" \
   "\"$VENV_PY\" -m isort src tests" \

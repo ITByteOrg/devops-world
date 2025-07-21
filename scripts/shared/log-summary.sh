@@ -35,6 +35,15 @@ done
   done
 
   echo ""
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  COMMIT=$(git rev-parse --short HEAD)
+  TIMESTAMP=$(date "+%Y-%m-%d %H:%M %Z")
+
+  echo "Metadata:" >> "$OUTPUT"
+  echo "- Branch: $BRANCH" >> "$OUTPUT"
+  echo "- Commit: $COMMIT" >> "$OUTPUT"
+  echo "- Timestamp: $TIMESTAMP" >> "$OUTPUT"
+
 } > "$OUTPUT"
 
 
