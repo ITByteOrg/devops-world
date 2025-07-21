@@ -129,6 +129,6 @@ Metadata:
 - Timestamp: 2025-07-14 21:22 EDT
 ```
 
-This log can be used in CI or audits to confirm tooling results. 
+This log can be used in CI or audits to confirm tooling results.  
 
 ---
