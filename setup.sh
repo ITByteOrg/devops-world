@@ -93,5 +93,5 @@ else
 fi
 
 # --- Done ---
-echo
+echo-StdLog 
 success "Setup complete. To activate environment: source .venv/bin/activate"

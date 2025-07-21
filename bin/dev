@@ -4,23 +4,26 @@
 # Description : Dev-mode helpers, test scaffolding, or debugging hooks.
 # ====================================================================
 
+# Load shared utilities
+source modules/shared-utils.sh
+
 # Load environment variables
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 else
-  echo "⚠️  Warning: .env file not found. Continuing without environment overrides."
+  echo-StdLog "⚠️  Warning: .env file not found. Continuing without environment overrides." warn
 fi
 
 
 # Ensure venv is activated
 source venv/Scripts/activate || {
-  echo "❌ ERROR: Could not activate virtual environment."
-  echo "💡 Hint: Did you create it with: py -m venv venv ?"
+  echo-StdLog "[ERROR]: Could not activate virtual environment." error
+  echo-StdLog "[INFO]: Did you create it with: py -m venv venv ?" info
   exit 1
 }
 
 # Set up PYTHONPATH and run tests
 export PYTHONPATH=src
 
-echo "🧪 Environment activated. Running tests..."
+echo-StdLog "🧪 Environment activated. Running tests..." raw
 pytest "$@"
