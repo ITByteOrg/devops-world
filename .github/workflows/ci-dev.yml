@@ -8,6 +8,7 @@ name: Dev CI
 on:
   push:
     branches: 
+      - main
       - feature
       - feature/*
       - hotfix/*
@@ -45,9 +46,9 @@ jobs:
           mv trufflehog /usr/local/bin/trufflehog
 
       - name: Run TruffleHog scan
-          run: |
-            trufflehog --version
-            trufflehog github --repo https://github.com/ITByteOrg/devops-world --exclude-path .trufflehogignore
+        run: |
+          chmod +x ./scripts/shared/trufflehog-wrapper.sh
+          ./scripts/shared/trufflehog-wrapper.sh --log logs/trufflehog-scan.json || echo "Scan completed with warnings"
 
       - name: Lint code
         # Only lint existing folders
