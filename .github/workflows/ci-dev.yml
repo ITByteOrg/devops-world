@@ -36,14 +36,9 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 bandit pytest
 
-          # Download the correct Linux binary
-          curl -L https://github.com/trufflesecurity/trufflehog/releases/download/v3.89.2/trufflehog-linux -o trufflehog
-
-          # Verify it's a binary and not an HTML error
-          file trufflehog | grep 'ELF' || { echo "❌ Invalid binary. Download failed."; exit 1; }
-
-          chmod +x trufflehog
-          mv trufflehog /usr/local/bin/trufflehog
+          # Install TruffleHog using shared script
+          chmod +x scripts/shared/trufflehog-install.sh
+          scripts/shared/trufflehog-install.sh
 
       - name: Run TruffleHog scan
         run: |
