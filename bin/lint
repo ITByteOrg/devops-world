@@ -4,24 +4,27 @@
 # Description : Code formatting, static analysis, or cleanup utilities.
 # ====================================================================
 
+# Resolve repository root
+GIT_ROOT="$(git rev-parse --show-toplevel)"
+source "$GIT_ROOT/scripts/modules/shared-utils.sh"
+
 # Load shared utilities
-source modules/shared-utils.sh
-source scripts/shared/bootstrap.sh
-source scripts/shared/lint-utils.sh
+source "$GIT_ROOT/scripts/shared/bootstrap.sh"
+source "$GIT_ROOT/scripts/shared/lint-utils.sh"
 
 # Load environment variables
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 else
-  echo-StdLog "Warning: .env file not found. Continuing without environment overrides." warn
+  write-stdlog "Warning: .env file not found. Continuing without environment overrides." warn
 fi
 
-echo-StdLog "Running flake8 via venv..." raw
+write-stdlog "Running flake8 via venv..." raw
 "$VENV_PY" -m flake8 src tests
 FLAKE8_VENV_OK=$?
-[[ $FLAKE8_VENV_OK -eq 0 ]] || echo-StdLog "[ERROR] flake8 (venv) failed" error
+[[ $FLAKE8_VENV_OK -eq 0 ]] || write-stdlog "[ERROR] flake8 (venv) failed" error
 
-LINT_STATUS="   [OK] All lint checks passed"
+LINT_STATUS="[OK] All lint checks passed"
 LINT_ACTIONS=""
 EXIT_CODE=0
 
@@ -40,9 +43,9 @@ run_check "FLAKE8" \
   "No flake8 issues found." \
   "flake8 failed"
 
-[[ $FLAKE8_OK -eq 0 ]] && LINT_ACTIONS+="   [OK] flake8 passed" || { LINT_ACTIONS+="   ❌ flake8 failed"; EXIT_CODE=1; }
+[[ $FLAKE8_OK -eq 0 ]] && LINT_ACTIONS+="[OK] flake8 passed" || { LINT_ACTIONS+="❌ flake8 failed"; EXIT_CODE=1; }
 
-[[ $EXIT_CODE -eq 0 ]] || LINT_STATUS="   ❌ One or more lint checks failed"
+[[ $EXIT_CODE -eq 0 ]] || LINT_STATUS="❌ One or more lint checks failed"
 
 bash scripts/shared/log-summary.sh \
   --title "Lint Summary" \

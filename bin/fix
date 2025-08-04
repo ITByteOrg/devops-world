@@ -20,7 +20,7 @@ export PYTHONPATH=src
 FIX_ACTIONS=()
 EXIT_CODE=0
 
-echo-StdLog "Applying fixes..." raw
+write-stdlog "Applying fixes..." raw
 
 run_step "Sorting imports" \
   "\"$VENV_PY\" -m isort src tests" \

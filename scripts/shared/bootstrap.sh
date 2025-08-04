@@ -16,15 +16,15 @@
 #   source scripts/shared/bootstrap.sh
 # -----------------------------------------------------------------------------
 
-# load shared-utils
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../modules/shared-utils.sh"
+# Resolve repository root
+GIT_ROOT="$(git rev-parse --show-toplevel)"
+source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 
 # Load environment variables
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 else
-  echo-StdLog "⚠️  Warning: .env file not found. Continuing without environment overrides." warn
+  write-stdlog "Warning: .env file not found. Continuing without environment overrides." warn
 fi
 
 # Cross-platform .venv activation
@@ -33,7 +33,7 @@ if [ -f ".venv/bin/activate" ]; then
 elif [ -f ".venv/Scripts/activate" ]; then
   source .venv/Scripts/activate
 else
-  echo-StdLog "❌ ERROR: Could not activate .venv" error
+  write-stdlog "ERROR: Could not activate .venv" error
   exit 1
 fi
 
@@ -43,7 +43,7 @@ if [ -x ".venv/bin/python" ]; then
 elif [ -x ".venv/Scripts/python.exe" ]; then
   export VENV_PY=".venv/Scripts/python.exe"
 else
-  echo-StdLog "❌ ERROR: Could not find .venv Python" error
+  write-stdlog "ERROR: Could not find .venv Python" error
   exit 1
 fi
 

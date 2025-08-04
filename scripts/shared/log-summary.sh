@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────
+# Script : log-summary.sh
+# Purpose: Summarize log outputs from CI runs, hook executions,
+#          or local scans into a readable format
+# Location: scripts/shared/
+# Usage   : bash scripts/shared/log-summary.sh
+# Notes   : Parses standardized log entries and outputs summary
+#           for visibility in CI dashboards or local review.
+# ─────────────────────────────────────────────────────────────
 
-# Usage:
-# bash log-summary.sh --title "Fix Summary" --status "✅ Success" --actions "✔ Imports sorted,✔ Code formatted" --output "logs/fix-summary.md"
-#
-# Example:
-# bash scripts/shared/log-summary.sh \
-#  --title "Check Summary" \
-# --status "All validations passed" \
-# --actions "Lint check completed,\
-# --output "logs/check-summary.md"
+# Resolve repository root
+GIT_ROOT="$(git rev-parse --show-toplevel)"
+source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -19,6 +22,8 @@ while [[ $# -gt 0 ]]; do
     *) shift ;;
   esac
 done
+
+write-stdlog "$TITLE complete. " raw
 
 {
   echo "# $TITLE"
