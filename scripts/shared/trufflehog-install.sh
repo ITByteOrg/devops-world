@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────
 # Script : trufflehog-install.sh
 # Purpose: Download and install TruffleHog CLI (v3.89.2) for use
@@ -9,7 +8,13 @@
 # Notes   : Verifies ELF binary format before installation.
 #           Designed for Linux-based CI runners and local dev.
 # ─────────────────────────────────────────────────────────────
+
+# Exit on error, unset variables trigger failure, and pipe errors are caught
 set -euo pipefail
+
+# Resolve repository root
+GIT_ROOT="$(git rev-parse --show-toplevel)"
+source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 
 VERSION="3.89.2"
 TARBALL="trufflehog_${VERSION}_linux_amd64.tar.gz"
@@ -17,28 +22,28 @@ DOWNLOAD_URL="https://github.com/trufflesecurity/trufflehog/releases/download/v$
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="trufflehog"
 
-echo "📥 Downloading TruffleHog ${VERSION} from GitHub..."
+write-stdlog "📥 Downloading TruffleHog ${VERSION} from GitHub..." info
 curl -sSL "$DOWNLOAD_URL" -o "$TARBALL"
 
-echo "📦 Extracting $TARBALL..."
+write-stdlog "📦 Extracting $TARBALL...", info
 tar -xzf "$TARBALL"
 
 if [[ ! -f "$BINARY_NAME" ]]; then
-  echo "❌ Expected binary '$BINARY_NAME' not found after extraction."
+  write-stdlog "❌ Expected binary '$BINARY_NAME' not found after extraction." error
   exit 1
 fi
 
-echo "🔒 Setting executable permissions..."
+write-stdlog "🔒 Setting executable permissions..." info
 chmod +x "$BINARY_NAME"
 
-echo "🚀 Installing to $INSTALL_DIR..."
+write-stdlog "🚀 Installing to $INSTALL_DIR..." info
 sudo mv "$BINARY_NAME" "$INSTALL_DIR/$BINARY_NAME"
 
-echo "🔍 Verifying installed binary..."
+write-stdlog "🔍 Verifying installed binary..." info
 if file "$INSTALL_DIR/$BINARY_NAME" | grep -q 'ELF'; then
-  echo "✅ TruffleHog installed successfully."
+  write-stdlog "✅ TruffleHog installed successfully." success
 else
-  echo "❌ Invalid binary format. Check download integrity."
+  write-stdlog "❌ Invalid binary format. Check download integrity." error
   exit 1
 fi
 

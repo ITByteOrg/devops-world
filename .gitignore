@@ -45,3 +45,6 @@ gunicorn.pid
 htmlcov/
 coverage.xml
 coverage.json
+
+# Ignore any pure testing files
+testing*

@@ -1,14 +1,31 @@
 #!/usr/bin/env pwsh
-# Hook: pre-push.ps1
-# Purpose: Run TruffleHog scan before Git push to catch secrets
+<#
+.SYNOPSIS
+Runs TruffleHog scan before a Git push to detect and block secrets in committed content.
+
+.DESCRIPTION
+This hook script is executed prior to a Git push. It imports shared utilities and TruffleHog scanning modules,
+ensuring they are available and properly initialized. If secrets are found in the latest commit range, the
+push is blocked to prevent leakage. Logging is performed using Write-Log and Write-StdLog functions.
+
+Module loading errors or missing required functions will fail the hook with diagnostic output.
+
+.NOTES
+Requirements : TruffleHog CLI, shared-utils.psm1, TruffleHogHookScanner.psm1
+
+.EXAMPLE
+& .\pre-push.ps1
+Triggers scan before pushing changes to remote Git repository.
+#>
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-# figure out where the repo lives 
+# Resolve repo paths
 $gitRoot = (& git rev-parse --show-toplevel).Trim()
 $moduleBase = Join-Path $gitRoot "scripts/modules"
 
+# Load modules
 try {
     Import-Module (Join-Path $moduleBase "shared-utils.psm1") -Force
     Import-Module (Join-Path $moduleBase "TruffleHogHookScanner.psm1") -Force
@@ -18,19 +35,10 @@ try {
     exit 1
 }
 
-$requiredFunctions = @('Resolve-RepoRoot', 'Write-Log', 'Invoke-TruffleHogHookScan')
-foreach ($func in $requiredFunctions) {
-    if (-not (Get-Command $func -ErrorAction SilentlyContinue)) {
-        Write-StdLog "Required function '$func' is not available after loading modules." -Type "error"
-        Write-StdLog "Available commands:" -Type "info"
-        Get-Command | Where-Object { $_.Source -like "*shared-utils*" -or $_.Source -like "*TruffleHog*" } | 
-            ForEach-Object { Write-Host "  $($_.Name)" -ForegroundColor Gray }
-        exit 1
-    }
-}
-
+# Run scan
 try {
     $scanResult = Invoke-TruffleHogHookScan -HookType pre-push
+
     if ($scanResult -isnot [hashtable]) {
         Write-Log "Scan failed due to environment issue (e.g., Docker not running)." -Type error
         exit 1
@@ -41,8 +49,7 @@ try {
         exit 1
     }
 
-    Write-Log "No secrets found—proceeding with push." -Type info
-
+    Write-Log "No secrets found — proceeding with push." -Type info
 } catch {
     Write-Log "Unexpected error during scan: $($_.Exception.Message)" -Type error
     exit 1

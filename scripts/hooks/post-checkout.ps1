@@ -20,5 +20,4 @@ try {
     exit 1
 }
 
-Write-Log "Branch checkout detected — repo root: $gitRoot" -Type "info"
 Write-StdLog "Git branch or file checkout completed." -Type "info"
