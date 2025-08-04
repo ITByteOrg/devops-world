@@ -21,6 +21,8 @@ if (-not (Test-Path $sharedUtilsPath)) {
     exit 1
 }
 
+Import-Module $sharedUtilsPath -Force
+
 # Define paths
 $gitHooksDir    = Join-Path $gitRoot "scripts/hooks"
 $targetHooksDir = Join-Path $gitRoot ".git/hooks"

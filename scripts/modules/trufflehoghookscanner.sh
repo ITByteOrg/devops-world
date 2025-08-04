@@ -51,7 +51,7 @@ scan_with_trufflehog() {
     write-log "Running TruffleHog scan on ${#scanTargets[@]} file(s)..." info
     for file in "${scanTargets[@]}"; do
         write-log "Scanning: $file" info
-        "$truffleCmd" filesystem --path "$file" --exclude "$excludeFile" || {
+        "$truffleCmd" filesystem "$file" --exclude "$excludeFile" || {
             write-log "Potential secrets found in $file" warn
         }
     done
