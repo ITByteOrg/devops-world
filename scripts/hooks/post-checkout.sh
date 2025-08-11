@@ -15,9 +15,16 @@
 #   Place in .git/hooks/post-checkout (or symlink if using core.hooksPath)
 # --------------------------------------------------------------------
 
+set -euo pipefail
+
 # Initialize
-GIT_ROOT="$(git rev-parse --show-toplevel)"
-source "$GIT_ROOT/scripts/modules/shared-utils.sh"
+GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$(pwd)")"
+
+if [[ -f "$GIT_ROOT/scripts/modules/shared-utils.sh" ]]; then
+  source "$GIT_ROOT/scripts/modules/shared-utils.sh"
+else
+  echo "[WARN] shared-utils.sh not found at expected path: $GIT_ROOT/scripts/modules/shared-utils.sh"
+fi
 
 # Extract arguments (passed by Git automatically)
 PREV_HEAD="$1"
