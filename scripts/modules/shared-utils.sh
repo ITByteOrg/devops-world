@@ -5,7 +5,7 @@
 # Description:
 #   Reusable Bash utility functions for console messaging and logging.
 #   Designed for use in Git hooks and CI workflows.
-#   Mirrors Shared-Utils.psm1 for cross-platform visual consistency.
+#   Mirrors SharedUtils.psm1 for cross-platform visual consistency.
 #
 # Functions:
 #   write_stdlog <message> <type>

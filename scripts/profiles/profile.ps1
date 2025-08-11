@@ -7,15 +7,15 @@ function Import-SharedUtils {
             Write-Host "[WARN] Not inside a Git repo — using fallback path"
             $repoRoot = "$HOME/dev/devops-world"
         }
-        $modulePath = "$repoRoot/scripts/modules/Shared-Utils.psm1"
+        $modulePath = "$repoRoot/scripts/modules/SharedUtils.psm1"
         if (-not (Test-Path $modulePath)) {
             Write-Host "[ERROR] Module not found at: $modulePath"
             return
         }
         Import-Module $modulePath -Force -ErrorAction Stop
-        Write-Host "[INFO] Shared-Utils.psm1 imported successfully"
+        Write-Host "[INFO] SharedUtils.psm1 imported successfully"
     } catch {
-        Write-Host "[ERROR] Failed to import Shared-Utils.psm1: $($_.Exception.Message)"
+        Write-Host "[ERROR] Failed to import SharedUtils.psm1: $($_.Exception.Message)"
     }
 }
 

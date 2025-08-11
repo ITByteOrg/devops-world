@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 
 # Resolve repo root
 $GIT_ROOT = git rev-parse --show-toplevel
-Import-Module "$GIT_ROOT/scripts/modules/Shared-Utils.psm1" -Force
+Import-Module "$GIT_ROOT/scripts/modules/SharedUtils.psm1" -Force
 
 Write-Host "🔍 Testing Write-Log for all types..."
 
