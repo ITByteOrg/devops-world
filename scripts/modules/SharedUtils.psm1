@@ -186,15 +186,15 @@ function Resolve-ModulePath {
 }
 
 function Test-DockerReady {
-    if (-not (Test-DockerAvailable)) {
-        Write-StdLog "Docker is not running. Please start Docker Desktop or your Docker daemon." "warn"
-        return @{
-            HasError = $true
-            HasSecrets = @{}
-            Raw = @("Docker is not running")
-        }
+    $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+    if (-not $dockerCmd) { return $false }
+
+    try {
+        $null = docker info | Out-Null
+        return $true
+    } catch {
+        return $false
     }
-    return $null
 }
 
 function Test-DockerAvailable {
