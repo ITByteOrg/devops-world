@@ -12,12 +12,21 @@
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-try {
-    Import-Module "$PWD/scripts/modules/SharedUtils.psm1" -Force
-    $gitRoot = Resolve-RepoRoot
-} catch {
-    Write-StdLog "Failed to import shared utilities: $($_.Exception.Message)" -Type "error"
-    exit 1
+$RepoRoot = git rev-parse --show-toplevel
+$SharedUtilsPath = "$RepoRoot/scripts/modules/SharedUtils.psm1"
+
+if (Test-Path $SharedUtilsPath) {
+    try {
+        Import-Module $SharedUtilsPath -Force
+    } catch {
+        Write-Host "[WARN] Failed to import shared utilities: $($_.Exception.Message)"
+    }
+} else {
+    Write-Host "[WARN] SharedUtils.psm1 not found at $SharedUtilsPath"
 }
 
-Write-StdLog "Git branch or file checkout completed." -Type "info"
+if (Get-Command Write-StdLog -ErrorAction SilentlyContinue) {
+    Write-StdLog "Post-checkout hook triggered for ref $args[1]" "info"
+} else {
+    Write-Host "[WARN] Write-StdLog not available—skipping structured logging"
+}
