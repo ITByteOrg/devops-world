@@ -185,4 +185,27 @@ function Resolve-ModulePath {
     }
 }
 
-Export-ModuleMember -Function Resolve-RepoRoot, Resolve-ModulePath, Write-Log, Write-StdLog, Get-CustomPrompt
+function Test-DockerReady {
+    if (-not (Test-DockerAvailable)) {
+        Write-StdLog "Docker is not running. Please start Docker Desktop or your Docker daemon." "warn"
+        return @{
+            HasError = $true
+            HasSecrets = @{}
+            Raw = @("Docker is not running")
+        }
+    }
+    return $null
+}
+
+function Test-DockerAvailable {
+    return (Get-Command docker -ErrorAction SilentlyContinue) -and 
+           ($null -ne (docker info -ErrorAction SilentlyContinue))
+}
+
+Export-ModuleMember -Function `
+    Resolve-RepoRoot, `
+    Resolve-ModulePath, `
+    Write-Log, `
+    Write-StdLog, `
+    Get-CustomPrompt, `
+    Test-DockerReady
