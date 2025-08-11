@@ -13,7 +13,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 try {
-    Import-Module "$PWD/scripts/modules/shared-utils.psm1" -Force
+    Import-Module "$PWD/scripts/modules/SharedUtils.psm1" -Force
     $gitRoot = Resolve-RepoRoot
 } catch {
     Write-StdLog "Failed to import shared utilities: $($_.Exception.Message)" -Type "error"

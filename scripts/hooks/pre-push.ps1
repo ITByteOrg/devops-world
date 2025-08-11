@@ -27,7 +27,7 @@ $moduleBase = Join-Path $gitRoot "scripts/modules"
 
 # Load modules
 try {
-    Import-Module (Join-Path $moduleBase "shared-utils.psm1") -Force
+    Import-Module (Join-Path $moduleBase "SharedUtils.psm1") -Force
     Import-Module (Join-Path $moduleBase "TruffleHogHookScanner.psm1") -Force
 } catch {
     Write-StdLog "Failed to import modules: $($_.Exception.Message)" -Type "error"

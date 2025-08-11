@@ -12,7 +12,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 try {
-    Import-Module "$PWD/scripts/modules/shared-utils.psm1" -Force
+    Import-Module "$PWD/scripts/modules/SharedUtils.psm1" -Force
 
     Write-StdLog "Current directory before scan: $(Get-Location)" -Type debug
     $InitialDir = Get-Location
