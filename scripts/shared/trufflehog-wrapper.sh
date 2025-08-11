@@ -84,7 +84,7 @@ docker run --rm -v "$PWD:/pwd" \
   --entrypoint trufflehog \
   "$TRUFFLEHOG_IMAGE" \
   filesystem "$SCAN_DIR" \
-  --exclude_paths "$EXCLUDE_FILE" \
+  --exclude-paths "$EXCLUDE_FILE" \
   --json \
   > "$RAW_OUTPUT" 2> logs/trufflehog_error.log
 
