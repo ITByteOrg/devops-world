@@ -13,16 +13,24 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $RepoRoot = git rev-parse --show-toplevel
+$VerboseMode = $env:GIT_HOOK_VERBOSE -eq "true"
 $SharedUtilsPath = "$RepoRoot/scripts/modules/SharedUtils.psm1"
 
 if (Test-Path $SharedUtilsPath) {
     try {
-        Import-Module $SharedUtilsPath -Force
+        Import-Module $SharedUtilsPath -Force -ErrorAction SilentlyContinue
 
-        # Ensure Docker is ready
-        if (-not (Test-DockerReady)) {
-            Write-Log "Docker is not running. Please start Docker Desktop or your Docker daemon." "warn"
-            exit 1
+        # Dispatcher call
+        $Status = Test-HookContext -RepoRoot $RepoRoot -VerboseMode $VerboseMode
+
+        # Conditional logic based on results
+        if ($Status.EnvMissing -contains "Docker (not running)") {
+            Write-Host "⏭️ Skipping Docker-dependent tasks."
+            return
+        }
+
+        if ($Status.ToolMissing -contains "trufflehog") {
+            Write-Host "⏭️ Skipping secret scan — trufflehog not available."
         }
     } catch {
         Write-Host "[WARN] Failed to import shared utilities: $($_.Exception.Message)"
@@ -32,7 +40,7 @@ if (Test-Path $SharedUtilsPath) {
 }
 
 if (Get-Command Write-StdLog -ErrorAction SilentlyContinue) {
-    Write-Log "Post-checkout hook triggered for ref $args[1]" "info"
+    Write-Log "Post-checkout hook triggered — branch switch detected" -Type "info"
 } else {
     Write-Host "[WARN] Write-Log not available—skipping structured logging"
 }

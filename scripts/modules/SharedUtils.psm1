@@ -16,7 +16,6 @@ function Get-CustomPrompt {
     return "$esc[32m$venv $esc[34m$cwd $esc[33m$branchText$esc[0m > "
 }
 
-
 function Write-Log {
     <#
     .SYNOPSIS
@@ -98,7 +97,6 @@ function Write-StdLog {
     )
     Write-Log -Message $Message -Type $Type
 }
-
 
 function Resolve-RepoRoot {
     <#
@@ -185,12 +183,57 @@ function Resolve-ModulePath {
     }
 }
 
+function Test-HookEnvironment {
+    param (
+        [string]$RepoRoot,
+        [bool]$VerboseMode = $false
+    )
+
+    $Missing = @()
+    $ProfilePath = Join-Path $RepoRoot "scripts/profiles/profile.ps1"
+    $SharedUtilsPath = Join-Path $RepoRoot "scripts/modules/SharedUtils.psm1"
+
+    # Check required files
+    if (-not (Test-Path $ProfilePath)) {
+        $Missing += "profile.ps1"
+        if ($VerboseMode) { Write-Warning "Missing: $ProfilePath" }
+    }
+
+    if (-not (Test-Path $SharedUtilsPath)) {
+        $Missing += "SharedUtils.psm1"
+        if ($VerboseMode) { Write-Warning "Missing: $SharedUtilsPath" }
+    }
+
+    # Check function availability
+    if (-not (Get-Command Write-Log -ErrorAction SilentlyContinue)) {
+        $Missing += "Write-Log"
+        if ($VerboseMode) { Write-Warning "Function Write-Log not available" }
+    }
+
+    # Check Docker readiness
+    if (-not (Test-DockerReady)) {
+        $Missing += "Docker (not running)"
+        if ($VerboseMode) { Write-Warning "Docker is not running or unreachable" }
+    }
+
+    # Summary output
+    if ($VerboseMode) {
+        if ($Missing.Count -eq 0) {
+            Write-Host "✅ Hook environment validated successfully."
+        } else {
+            Write-Host "⚠️ Hook environment incomplete: $($Missing -join ', ')"
+        }
+    }
+
+    return $Missing
+}
+
 function Test-DockerReady {
     $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
     if (-not $dockerCmd) { return $false }
 
     try {
-        $null = docker info | Out-Null
+        docker info 2>$null | Out-Null
         return $true
     } catch {
         return $false
@@ -202,10 +245,92 @@ function Test-DockerAvailable {
            ($null -ne (docker info -ErrorAction SilentlyContinue))
 }
 
+function Test-HookContext {
+    <#
+    .SYNOPSIS
+    Validates the hook environment and required CLI tools.
+
+    .DESCRIPTION
+    Runs both Test-HookEnvironment and Test-ToolReady to check for required files,
+    functions, Docker readiness, and external tools. Returns a structured object
+    with missing items for conditional logic in hook scripts.
+
+    .PARAMETER RepoRoot
+    The root directory of the repository (typically from git rev-parse).
+
+    .PARAMETER Tools
+    An array of CLI tools to check for availability (e.g., git, python, trufflehog).
+
+    .PARAMETER VerboseMode
+    If true, prints warnings and status messages to the console.
+
+    .OUTPUTS
+    [hashtable] with two keys:
+        EnvMissing  - array of missing environment components
+        ToolMissing - array of missing CLI tools
+
+    .EXAMPLE
+    $Status = Test-HookContext -RepoRoot $RepoRoot -Tools @("git", "trufflehog") -VerboseMode $true
+
+    if ($Status.EnvMissing -contains "Docker (not running)") {
+        Write-Host "Skipping Docker-dependent tasks."
+        return
+    }
+
+    if ($Status.ToolMissing -contains "trufflehog") {
+        Write-Host "Skipping secret scan — trufflehog not available."
+    }
+    #>
+    param (
+        [string]$RepoRoot,
+        [string[]]$Tools = @("git", "python", "trufflehog"),
+        [bool]$VerboseMode = $false
+    )
+
+    $EnvMissing = Test-HookEnvironment -RepoRoot $RepoRoot -VerboseMode $VerboseMode
+    $ToolMissing = Test-ToolReady -Tools $Tools -VerboseMode $VerboseMode
+
+    return @{
+        EnvMissing  = $EnvMissing
+        ToolMissing = $ToolMissing
+    }
+}
+
+function Test-ToolReady {
+    param (
+        [string[]]$Tools = @("git", "python", "trufflehog"),
+        [bool]$VerboseMode = $false
+    )
+
+    $MissingTools = @()
+
+    foreach ($Tool in $Tools) {
+        if (-not (Get-Command $Tool -ErrorAction SilentlyContinue)) {
+            $MissingTools += $Tool
+            if ($VerboseMode) {
+                Write-Warning "$Tool not found in PATH"
+            }
+        }
+    }
+
+    if ($VerboseMode) {
+        if ($MissingTools.Count -eq 0) {
+            Write-Host "✅ All requested tools are available."
+        } else {
+            Write-Host "⚠️ Missing tools: $($MissingTools -join ', ')"
+        }
+    }
+
+    return $MissingTools
+}
+
 Export-ModuleMember -Function `
     Resolve-RepoRoot, `
     Resolve-ModulePath, `
     Write-Log, `
     Write-StdLog, `
+    Test-HookEnvironment, `
     Get-CustomPrompt, `
-    Test-DockerReady
+    Test-DockerReady, `
+    Test-HookContext
+    
