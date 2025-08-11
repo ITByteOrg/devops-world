@@ -58,5 +58,3 @@ scan_with_trufflehog() {
 
     write_log "TruffleHog hook scan completed." success
 }
-
-scan_with_trufflehog "$@"
