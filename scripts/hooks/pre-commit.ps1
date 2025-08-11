@@ -13,6 +13,10 @@ Set-StrictMode -Version Latest
 
 try {
     Import-Module "$PWD/scripts/modules/shared-utils.psm1" -Force
+
+    Write-StdLog "Current directory before scan: $(Get-Location)" -Type debug
+    $InitialDir = Get-Location
+
     $gitRoot = Resolve-RepoRoot
     Import-Module "$gitRoot/scripts/modules/TruffleHogHookScanner.psm1" -Force
 } catch {
@@ -26,4 +30,6 @@ if (-not (Invoke-TruffleHogHookScan -HookType 'pre-commit')) {
 }
 
 Write-StdLog "TruffleHog scan passed — proceeding with commit." -Type "success"
+Set-Location $InitialDir
+Write-StdLog "Current directory after scan: $(Get-Location)" -Type debug
 exit 0
