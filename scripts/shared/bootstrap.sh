@@ -49,3 +49,22 @@ fi
 
 # Set Python path
 export PYTHONPATH=src
+
+# Start SSH agent and add key if available
+if command -v ssh-agent >/dev/null && command -v ssh-add >/dev/null; then
+    eval "$(ssh-agent -s)" >/dev/null
+    SSH_KEY="$HOME/.ssh/id_ed25519"
+
+    if [ -f "$SSH_KEY" ]; then
+        if ! ssh-add -l | grep -q "$SSH_KEY"; then
+            ssh-add "$SSH_KEY" >/dev/null
+            write-stdlog "SSH key added to agent." info
+        else
+            write-stdlog "SSH key already loaded." info
+        fi
+    else
+        write-stdlog "SSH key not found at $SSH_KEY. Skipping SSH setup." warn
+    fi
+else
+    write-stdlog "ssh-agent or ssh-add not available. Skipping SSH setup." warn
+fi
