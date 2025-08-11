@@ -18,12 +18,10 @@
 #   CI-aware: outputs adapt based on terminal detection
 # --------------------------------------------------------------------
 
-# Resolve repository root
+# Resolve paths
 GIT_ROOT="$(git rev-parse --show-toplevel)"
-
-# Load shared utilities
 source "$GIT_ROOT/scripts/modules/shared-utils.sh"
-source "$GIT_ROOT/scripts/modules/TruffleHogHookScanner.sh"
+source "$GIT_ROOT/scripts/modules/trufflehoghookscanner.sh"
 
 # Execute scan
 if ! scan_with_trufflehog; then
