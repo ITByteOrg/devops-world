@@ -17,7 +17,7 @@ source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 source "$GIT_ROOT/scripts/modules/trufflehoghookscanner.sh"
 
 # Run secret scan
-if ! run_trufflehog_scan; then
+if ! scan_with_trufflehog; then
   write_stdlog "Secret detected — blocking commit!" error
   exit 1
 fi
