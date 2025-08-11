@@ -13,7 +13,6 @@ function Import-SharedUtils {
             return
         }
         Import-Module $modulePath -Force -ErrorAction Stop
-        Write-Host "[INFO] SharedUtils.psm1 imported successfully"
     } catch {
         Write-Host "[ERROR] Failed to import SharedUtils.psm1: $($_.Exception.Message)"
     }
@@ -21,12 +20,9 @@ function Import-SharedUtils {
 
 Import-Module posh-git
 Import-SharedUtils
-if (Get-Command Get-CustomPrompt -ErrorAction SilentlyContinue) {
-    Write-Host "[INFO] Get-CustomPrompt is available"
-} else {
+if (-not (Get-Command Get-CustomPrompt -ErrorAction SilentlyContinue)) {
     Write-Host "[ERROR] Get-CustomPrompt not found after import"
 }
-
 function prompt {
     Get-CustomPrompt
 }
