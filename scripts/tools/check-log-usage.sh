@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────
 # Script : check-log-usage.sh
-# Purpose: Identify Bash scripts using write-stdlog or write-log
+# Purpose: Identify Bash scripts using write_stdlog or write-log
 # Location: scripts/tools/
 # Usage   : bash scripts/tools/check-log-usage.sh
 # Notes   : Recursively searches for .sh files and checks for log functions.
@@ -14,7 +14,7 @@ set -euo pipefail
 GIT_ROOT="$(git rev-parse --show-toplevel)"
 source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 
-LOG_FUNCS=("write-stdlog" "write-log")
+LOG_FUNCS=("write_stdlog" "write-log")
 declare -A results=()
 
 echo "Scanning for log function usage in Bash scripts..."
@@ -35,11 +35,11 @@ done < <(
 )
 
 if [[ ${#results[@]} -eq 0 ]]; then
-    echo "No Bash scripts found using write-stdlog or write-log."
+    echo "No Bash scripts found using write_stdlog or write-log."
     exit 0
 fi
 
-write-stdlog "Log usage report:" info
+write_stdlog "Log usage report:" info
 declare -i none_found_count=0
 
 for file in "${!results[@]}"; do
@@ -50,4 +50,4 @@ for file in "${!results[@]}"; do
     printf "• %-60s : %s\n" "$(basename "$file")" "$result"
 done
 
-write-stdlog "Total entries with 'None' found: $none_found_count" info
+write_stdlog "Total entries with 'None' found: $none_found_count" info

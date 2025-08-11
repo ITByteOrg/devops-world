@@ -19,7 +19,7 @@ scan_with_trufflehog() {
   local type="${2:-info}"        # Default to 'info' if not provided
   type="${type,,}"               # Normalize type to lowercase
 
-  write-stdlog "🔍 Running TruffleHog scan in '$scanMode' mode..." "$type"
+  write_stdlog "🔍 Running TruffleHog scan in '$scanMode' mode..." "$type"
 
     # config 
     local repoRoot="$(git rev-parse --show-toplevel)"

@@ -48,7 +48,7 @@ while [[ $# -gt 0 ]]; do
     --dir) shift; SCAN_DIR="$1" ;;
     --exclude) shift; EXCLUDE_FILE="$1" ;;
     --log) shift; LOG_FILE="$1" ;;
-    *) write-stdlog "Unknown argument: $1" error; exit 1 ;;
+    *) write_stdlog "Unknown argument: $1" error; exit 1 ;;
   esac
   shift
 done
@@ -65,7 +65,7 @@ fi
 
 # Validate exclude file exists
 if [[ ! -f "$(pwd)/$(basename "$EXCLUDE_FILE")" ]]; then
-  write-stdlog "[Error] Exclude file not found: $EXCLUDE_FILE" error
+  write_stdlog "[Error] Exclude file not found: $EXCLUDE_FILE" error
   exit 1
 fi
 
@@ -92,7 +92,7 @@ docker run --rm -v "$PWD:/pwd" \
 if [[ -n "$LOG_FILE" && "$RAW_OUTPUT" != "$LOG_FILE" ]]; then
   cp "$RAW_OUTPUT" "$LOG_FILE"
 else
-  write-stdlog "Skipping redundant copy — log file already in target location" info
+  write_stdlog "Skipping redundant copy — log file already in target location" info
 fi
 
 # if file in $RAW_OUTPUT exists and size gt 0

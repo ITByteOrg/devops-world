@@ -22,40 +22,40 @@ source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 # Input: commit message file
 COMMIT_MSG_FILE="$1"
 
-write-stdlog "Running commit-msg hook..." info
+write_stdlog "Running commit-msg hook..." info
 
 # Validate commit message file exists
 if [[ ! -f "$COMMIT_MSG_FILE" ]]; then
-  write-stdlog "Missing commit message file: $COMMIT_MSG_FILE" error
+  write_stdlog "Missing commit message file: $COMMIT_MSG_FILE" error
   exit 1
 fi
 
 # Extract commit message
 COMMIT_MESSAGE="$(<"$COMMIT_MSG_FILE")"
-write-stdlog "Commit message: \"$COMMIT_MESSAGE\"" info
+write_stdlog "Commit message: \"$COMMIT_MESSAGE\"" info
 
 # Format check: starts with capital letter
 if [[ ! "$COMMIT_MESSAGE" =~ ^[A-Z] ]]; then
-  write-stdlog "Message should start with a capital letter." warn
+  write_stdlog "Message should start with a capital letter." warn
 fi
 
 # Retrieve latest commit hash
 LATEST_COMMIT="$(git rev-parse HEAD 2>/dev/null)"
-write-stdlog "Latest commit: $LATEST_COMMIT" info
+write_stdlog "Latest commit: $LATEST_COMMIT" info
 
 # TruffleHog scan
-write-stdlog "Scanning with TruffleHog..." info
+write_stdlog "Scanning with TruffleHog..." info
 TRUFFLE_OUTPUT="$(trufflehog git --commit "$LATEST_COMMIT" 2>&1)"
 
 # Detect secret patterns
 if [[ "$TRUFFLE_OUTPUT" =~ "Found [0-9]+ results" ]]; then
-  write-stdlog "TruffleHog detected possible secrets!" error
+  write_stdlog "TruffleHog detected possible secrets!" error
   echo "$TRUFFLE_OUTPUT" >&2
   exit 1
 else
-  write-stdlog "TruffleHog scan passed — no secrets detected." success
+  write_stdlog "TruffleHog scan passed — no secrets detected." success
 fi
 
 # Completion message
-write-stdlog "commit-msg hook completed." success
+write_stdlog "commit-msg hook completed." success
 exit 0

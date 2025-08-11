@@ -22,28 +22,28 @@ DOWNLOAD_URL="https://github.com/trufflesecurity/trufflehog/releases/download/v$
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="trufflehog"
 
-write-stdlog "📥 Downloading TruffleHog ${VERSION} from GitHub..." info
+write_stdlog "📥 Downloading TruffleHog ${VERSION} from GitHub..." info
 curl -sSL "$DOWNLOAD_URL" -o "$TARBALL"
 
-write-stdlog "📦 Extracting $TARBALL...", info
+write_stdlog "📦 Extracting $TARBALL...", info
 tar -xzf "$TARBALL"
 
 if [[ ! -f "$BINARY_NAME" ]]; then
-  write-stdlog "❌ Expected binary '$BINARY_NAME' not found after extraction." error
+  write_stdlog "❌ Expected binary '$BINARY_NAME' not found after extraction." error
   exit 1
 fi
 
-write-stdlog "🔒 Setting executable permissions..." info
+write_stdlog "🔒 Setting executable permissions..." info
 chmod +x "$BINARY_NAME"
 
-write-stdlog "🚀 Installing to $INSTALL_DIR..." info
+write_stdlog "🚀 Installing to $INSTALL_DIR..." info
 sudo mv "$BINARY_NAME" "$INSTALL_DIR/$BINARY_NAME"
 
-write-stdlog "🔍 Verifying installed binary..." info
+write_stdlog "🔍 Verifying installed binary..." info
 if file "$INSTALL_DIR/$BINARY_NAME" | grep -q 'ELF'; then
-  write-stdlog "✅ TruffleHog installed successfully." success
+  write_stdlog "✅ TruffleHog installed successfully." success
 else
-  write-stdlog "❌ Invalid binary format. Check download integrity." error
+  write_stdlog "❌ Invalid binary format. Check download integrity." error
   exit 1
 fi
 

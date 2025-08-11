@@ -21,18 +21,18 @@ source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 FORCE=false
 if [[ "${1:-}" == "--force" ]]; then
   FORCE=true
-  write-stdlog "Force flag detected. Rebuilding virtual environment..." info
+  write_stdlog "Force flag detected. Rebuilding virtual environment..." info
 fi
 
 # --- Check Python ---
 if ! command -v python3 >/dev/null; then
-  write-stdlog "Python3 not found. Please install Python 3.8+" error
+  write_stdlog "Python3 not found. Please install Python 3.8+" error
   exit 1
 fi
 
 # --- Check pip ---
 if ! command -v pip3 >/dev/null; then
-  write-stdlog "pip3 not found. Please install pip for Python 3" error
+  write_stdlog "pip3 not found. Please install pip for Python 3" error
   exit 1
 fi
 
@@ -42,48 +42,48 @@ if [[ -d ".venv" ]]; then
     info "Removing existing virtual environment..."
     rm -rf .venv
     python3 -m venv .venv
-    write-stdlog "Recreated virtual environment at .venv/" success
+    write_stdlog "Recreated virtual environment at .venv/" success
   else
-    write-stdlog "Virtual environment already exists. Skipping creation." success
+    write_stdlog "Virtual environment already exists. Skipping creation." success
   fi
 else
   python3 -m venv .venv
-  write-stdlog "Created virtual environment at .venv/" success
+  write_stdlog "Created virtual environment at .venv/" success
 fi
 
 # --- Activate environment ---
 source .venv/bin/activate
 
 # --- Install packages ---
-write-stdlog "Installing runtime dependencies from requirements.txt..."
+write_stdlog "Installing runtime dependencies from requirements.txt..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
-write-stdlog "Installing development dependencies from requirements-dev.txt..."
+write_stdlog "Installing development dependencies from requirements-dev.txt..."
 pip install -r requirements-dev.txt
 
-write-stdlog "Python dependencies installed." success
+write_stdlog "Python dependencies installed." success
 
 # --- Check for Docker ---
 if ! command -v docker >/dev/null; then
-  write-stdlog "Docker not found. TruffleHog scan and related workflows may not work." warn
+  write_stdlog "Docker not found. TruffleHog scan and related workflows may not work." warn
 else
-  write-stdlog "Docker is available." success
+  write_stdlog "Docker is available." success
 fi
 
 # --- Check for jq ---
 if ! command -v jq >/dev/null; then
-  write-stdlog "jq not found. Attempting installation..." info
+  write_stdlog "jq not found. Attempting installation..." info
   if command -v apt-get >/dev/null; then
     sudo apt-get update
     sudo apt-get install -y jq
-    write-stdlog "jq installed via apt." success
+    write_stdlog "jq installed via apt." success
   else
-    write-stdlog "jq not available. Please install manually for summary parsing." error
+    write_stdlog "jq not available. Please install manually for summary parsing." error
   fi
 else
-  write-stdlog "jq is already installed." success
+  write_stdlog "jq is already installed." success
 fi
 
 # --- Done ---
-write-stdlog "Setup complete. To activate environment: source .venv/bin/activate" success
+write_stdlog "Setup complete. To activate environment: source .venv/bin/activate" success

@@ -8,7 +8,7 @@
 #   pushes containing flagged content.
 #
 # Dependencies:
-#   - shared-utils.sh: provides logging functions (write-stdlog)
+#   - shared-utils.sh: provides logging functions (write_stdlog)
 #   - TruffleHogHookScanner.sh: performs the actual secret scan
 #
 # Usage:
@@ -27,9 +27,9 @@ source "$GIT_ROOT/scripts/modules/TruffleHogHookScanner.sh"
 
 # Execute scan
 if ! run_trufflehog_scan; then
-  write-stdlog "Secret detected — push blocked!" error
+  write_stdlog "Secret detected — push blocked!" error
   exit 1
 fi
 
-write-stdlog "Push clean — no secrets found." success
+write_stdlog "Push clean — no secrets found." success
 exit 0

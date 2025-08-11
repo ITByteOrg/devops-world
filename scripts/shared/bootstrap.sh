@@ -24,7 +24,7 @@ source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 else
-  write-stdlog "Warning: .env file not found. Continuing without environment overrides." warn
+  write_stdlog "Warning: .env file not found. Continuing without environment overrides." warn
 fi
 
 # Cross-platform .venv activation
@@ -33,7 +33,7 @@ if [ -f ".venv/bin/activate" ]; then
 elif [ -f ".venv/Scripts/activate" ]; then
   source .venv/Scripts/activate
 else
-  write-stdlog "ERROR: Could not activate .venv" error
+  write_stdlog "ERROR: Could not activate .venv" error
   exit 1
 fi
 
@@ -43,7 +43,7 @@ if [ -x ".venv/bin/python" ]; then
 elif [ -x ".venv/Scripts/python.exe" ]; then
   export VENV_PY=".venv/Scripts/python.exe"
 else
-  write-stdlog "ERROR: Could not find .venv Python" error
+  write_stdlog "ERROR: Could not find .venv Python" error
   exit 1
 fi
 

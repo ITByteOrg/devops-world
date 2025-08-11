@@ -18,9 +18,9 @@ source "$GIT_ROOT/scripts/modules/trufflehoghookscanner.sh"
 
 # Run secret scan
 if ! run_trufflehog_scan; then
-  write-stdlog "Secret detected — blocking commit!" error
+  write_stdlog "Secret detected — blocking commit!" error
   exit 1
 fi
 
-write-stdlog "No secrets found — commit approved." success
+write_stdlog "No secrets found — commit approved." success
 exit 0
