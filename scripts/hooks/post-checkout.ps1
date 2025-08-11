@@ -18,6 +18,12 @@ $SharedUtilsPath = "$RepoRoot/scripts/modules/SharedUtils.psm1"
 if (Test-Path $SharedUtilsPath) {
     try {
         Import-Module $SharedUtilsPath -Force
+
+        # Ensure Docker is ready
+        if (-not (Test-DockerReady)) {
+            Write-Log "Docker is not running. Please start Docker Desktop or your Docker daemon." "warn"
+            exit 1
+        }
     } catch {
         Write-Host "[WARN] Failed to import shared utilities: $($_.Exception.Message)"
     }
@@ -26,7 +32,7 @@ if (Test-Path $SharedUtilsPath) {
 }
 
 if (Get-Command Write-StdLog -ErrorAction SilentlyContinue) {
-    Write-StdLog "Post-checkout hook triggered for ref $args[1]" "info"
+    Write-Log "Post-checkout hook triggered for ref $args[1]" "info"
 } else {
-    Write-Host "[WARN] Write-StdLog not available—skipping structured logging"
+    Write-Host "[WARN] Write-Log not available—skipping structured logging"
 }
