@@ -154,6 +154,8 @@ function Test-BinFilesForCRLF {
     return $crlfFound
 }
 
+
+
 Export-ModuleMember `
     -Function Initialize-TruffleHogLogDir, `
               Invoke-TruffleHogScan, `

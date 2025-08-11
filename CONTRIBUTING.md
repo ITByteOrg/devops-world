@@ -4,6 +4,16 @@ This document defines conventions for naming, scripting, logging, and workflow d
 
 ---
 
+## Contribution Status
+
+This repository is not currently accepting external contributions while core tooling and documentation are being refined. These guidelines are published in advance to support future collaboration and transparency.
+
+This project is shared under the CC-BY-4.0 license and may be used or adapted freely. While pull requests are not accepted at this time, feedback and ideas are welcome via issues or mentions.
+
+If you find the structure useful, feel free to adapt it for your own projects. Contributions may be welcomed in a future release.
+
+---
+
 ## Getting Started
 
 To configure your environment and install dependencies, see the [Installation section of README.md](./README.md#installation).

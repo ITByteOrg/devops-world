@@ -24,7 +24,7 @@ source "$GIT_ROOT/scripts/modules/shared-utils.sh"
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 else
-  write-stdlog "Warning: .env file not found. Continuing without environment overrides." warn
+  write_stdlog "Warning: .env file not found. Continuing without environment overrides." warn
 fi
 
 # Cross-platform .venv activation
@@ -33,7 +33,7 @@ if [ -f ".venv/bin/activate" ]; then
 elif [ -f ".venv/Scripts/activate" ]; then
   source .venv/Scripts/activate
 else
-  write-stdlog "ERROR: Could not activate .venv" error
+  write_stdlog "ERROR: Could not activate .venv" error
   exit 1
 fi
 
@@ -43,9 +43,28 @@ if [ -x ".venv/bin/python" ]; then
 elif [ -x ".venv/Scripts/python.exe" ]; then
   export VENV_PY=".venv/Scripts/python.exe"
 else
-  write-stdlog "ERROR: Could not find .venv Python" error
+  write_stdlog "ERROR: Could not find .venv Python" error
   exit 1
 fi
 
 # Set Python path
 export PYTHONPATH=src
+
+# Start SSH agent and add key if available
+if command -v ssh-agent >/dev/null && command -v ssh-add >/dev/null; then
+    eval "$(ssh-agent -s)" >/dev/null
+    SSH_KEY="$HOME/.ssh/id_ed25519"
+
+    if [ -f "$SSH_KEY" ]; then
+        if ! ssh-add -l | grep -q "$SSH_KEY"; then
+            ssh-add "$SSH_KEY" >/dev/null
+            write-stdlog "SSH key added to agent." info
+        else
+            write-stdlog "SSH key already loaded." info
+        fi
+    else
+        write-stdlog "SSH key not found at $SSH_KEY. Skipping SSH setup." warn
+    fi
+else
+    write-stdlog "ssh-agent or ssh-add not available. Skipping SSH setup." warn
+fi

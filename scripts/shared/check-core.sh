@@ -29,8 +29,8 @@ run_step() {
   local action_list="$5"  # e.g., ACTIONS or FIX_ACTIONS
   local quiet="$6"
 
-  write-stdlog ""
-  write-stdlog "${label}:" raw
+  write_stdlog ""
+  write_stdlog "${label}:" raw
 
   [[ "$quiet" == "true" ]] && cmd="$cmd -q"
 
@@ -41,10 +41,10 @@ run_step() {
   [[ -n "$output" ]] && echo "$output"
 
   if [[ $status -eq 0 ]]; then
-    write-stdlog "   [OK] $ok_msg" success
+    write_stdlog "   [OK] $ok_msg" success
     eval "$action_list+=(\"[OK] $label\")"
   else
-    write-stdlog "   [ERROR] $fail_msg"
+    write_stdlog "   [ERROR] $fail_msg"
     eval "$action_list+=(\"[X] $label\")"
     STATUS="[ERROR] One or more steps failed"
     EXIT_CODE=1

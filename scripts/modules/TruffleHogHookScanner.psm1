@@ -58,7 +58,7 @@ function Invoke-TrufflehogScan {
                 "-v", "${PWD}:/pwd",
                 "--entrypoint", "trufflehog",
                 "ghcr.io/trufflesecurity/trufflehog:latest",
-                "filesystem", "/pwd/$([System.IO.Path]::GetFileName($tempFilePath))"
+                "filesystem", "/pwd/$([System.IO.Path]::GetFileName($tempFilePath)),"
                 "--json"
             )
 

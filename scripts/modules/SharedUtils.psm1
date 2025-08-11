@@ -7,6 +7,16 @@
   and emitting consistent log output. Used across Git hooks and automation scripts.
 #>
 
+function Get-CustomPrompt {
+    $esc = "`e"
+    $venv = if ($env:VIRTUAL_ENV) { "($([System.IO.Path]::GetFileName($env:VIRTUAL_ENV)))" } else { "" }
+    $gitBranch = git rev-parse --abbrev-ref HEAD 2>$null
+    $branchText = if ($gitBranch) { "[$gitBranch]" } else { "" }
+    $cwd = Get-Location
+    return "$esc[32m$venv $esc[34m$cwd $esc[33m$branchText$esc[0m > "
+}
+
+
 function Write-Log {
     <#
     .SYNOPSIS
@@ -21,17 +31,15 @@ function Write-Log {
 
     #>
     param (
-        [Parameter(Mandatory)]
-        [string]$Message,
+    [Parameter(Mandatory)] 
+    [string]$Message,
 
-        [ValidateSet("info", "warn", "error", "success", "ok", "debug")]
-        [string]$Type = "info",
+    [string]$Type = "info",  # Default to 'info' like Bash
 
-        [switch]$ToFile,
-
-        [string]$LogDir
+    [switch]$ToFile,
+    [string]$LogDir,
+    [string]$LogName
     )
-
     $global:IsCI = $env:CI -or $env:GITHUB_ACTIONS -or $env:BUILD_BUILDID
 
     if (-not $IsCI) {
@@ -46,27 +54,33 @@ function Write-Log {
             default = "White"
         }
 
-        $prefix = if ($iconMap.ContainsKey($Type)) { "$($iconMap[$Type]) " } else { "" }
+        $prefix = if ($iconMap.ContainsKey($Type)) { "$($iconMap[$Type]) " } else { "[$Type] " }
         $color  = if ($colorMap.ContainsKey($Type)) { $colorMap[$Type] } else { $colorMap["default"] }
 
         Write-Host "$prefix$Message" -ForegroundColor $color
     }
 
+    # If running in CI, write to the standard output
     if ($ToFile -and $LogDir) {
-        $logFile = Join-Path $LogDir "bootstrap.log"
         if (-not (Test-Path $LogDir)) {
             New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
         }
 
-        $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-        Add-Content -Path $logFile -Value "[$timestamp][$Type] $Message"
+    $scriptName = $MyInvocation.ScriptName
+    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($scriptName)
+    $logFileName = if ($LogName) { $LogName } else { "$baseName.log" }
+    $logFile = Join-Path $LogDir $logFileName
+
+    $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    $cleanMessage = $Message -replace "`e\[[0-9;]*[a-zA-Z]", ""
+    Add-Content -Path $logFile -Value "[$timestamp][$Type] $cleanMessage"
     }
 }
 
 function Write-StdLog {
-    <#
+   <#
     .SYNOPSIS
-        Minimalist console output with structured icons and color.
+        Minimalist console output with structured icons and color. Wrapper for Write-Log.
 
     .DESCRIPTION
         Provides single-line messaging aligned with Write-Log styling,
@@ -77,30 +91,12 @@ function Write-StdLog {
 
     .PARAMETER Type
         Log level indicator: info, warn, error, success, ok, debug.
-    #>
+    #>    
     param (
-        [Parameter(Mandatory)]
-        [string]$Message,
-
-        [ValidateSet("info", "warn", "error", "success", "ok", "debug")]
+        [Parameter(Mandatory)][string]$Message,
         [string]$Type = "info"
     )
-
-    $iconMap = @{
-        info    = "[INFO]";    warn    = "[WARN]";   error   = "[ERROR]"
-        success = "[SUCCESS]"; ok      = "[OK]";     debug   = "[DEBUG]"
-    }
-
-    $colorMap = @{
-        info    = "Cyan";     warn    = "Yellow";   error   = "Red"
-        success = "Green";    ok      = "Green";    debug   = "Gray"
-        default = "White"
-    }
-
-    $prefix = if ($iconMap.ContainsKey($Type)) { "$($iconMap[$Type]) " } else { "" }
-    $color  = if ($colorMap.ContainsKey($Type)) { $colorMap[$Type] } else { $colorMap["default"] }
-
-    Write-Host "$prefix$Message" -ForegroundColor $color
+    Write-Log -Message $Message -Type $Type
 }
 
 
@@ -189,4 +185,27 @@ function Resolve-ModulePath {
     }
 }
 
-Export-ModuleMember -Function Resolve-RepoRoot, Resolve-ModulePath, Write-Log, Write-StdLog
+function Test-DockerReady {
+    $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+    if (-not $dockerCmd) { return $false }
+
+    try {
+        $null = docker info | Out-Null
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+function Test-DockerAvailable {
+    return (Get-Command docker -ErrorAction SilentlyContinue) -and 
+           ($null -ne (docker info -ErrorAction SilentlyContinue))
+}
+
+Export-ModuleMember -Function `
+    Resolve-RepoRoot, `
+    Resolve-ModulePath, `
+    Write-Log, `
+    Write-StdLog, `
+    Get-CustomPrompt, `
+    Test-DockerReady

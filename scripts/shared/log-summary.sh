@@ -23,7 +23,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-write-stdlog "$TITLE complete. " raw
+write_stdlog "$TITLE complete. " raw
 
 {
   echo "# $TITLE"

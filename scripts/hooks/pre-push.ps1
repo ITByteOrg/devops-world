@@ -27,11 +27,17 @@ $moduleBase = Join-Path $gitRoot "scripts/modules"
 
 # Load modules
 try {
-    Import-Module (Join-Path $moduleBase "shared-utils.psm1") -Force
+    Import-Module (Join-Path $moduleBase "SharedUtils.psm1") -Force
     Import-Module (Join-Path $moduleBase "TruffleHogHookScanner.psm1") -Force
 } catch {
-    Write-StdLog "Failed to import modules: $($_.Exception.Message)" -Type "error"
-    Write-StdLog "Stack trace: $($_.ScriptStackTrace)" -Type "error"
+    Write-Log "Failed to import modules: $($_.Exception.Message)" -Type "error"
+    Write-Log "Stack trace: $($_.ScriptStackTrace)" -Type "error"
+    exit 1
+}
+
+# Ensure Docker is ready
+if (-not (Test-DockerReady)) {
+    Write-Log "Docker is not running. Please start Docker Desktop or your Docker daemon." "warn"
     exit 1
 }
 

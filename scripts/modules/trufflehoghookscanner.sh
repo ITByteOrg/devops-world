@@ -19,7 +19,7 @@ scan_with_trufflehog() {
   local type="${2:-info}"        # Default to 'info' if not provided
   type="${type,,}"               # Normalize type to lowercase
 
-  write-stdlog "🔍 Running TruffleHog scan in '$scanMode' mode..." "$type"
+  write_stdlog "🔍 Running TruffleHog scan in '$scanMode' mode..." "$type"
 
     # config 
     local repoRoot="$(git rev-parse --show-toplevel)"
@@ -38,25 +38,23 @@ scan_with_trufflehog() {
             [[ -f "$file" ]] && scanTargets+=("$file")
         done < <(git diff HEAD~1 --name-only)
     else
-        write-log "Unrecognized scan mode: $scanMode" error
+        write_log "Unrecognized scan mode: $scanMode" error
         exit 1
     fi
 
     # Run TruffleHog Scan 
     if [[ "${#scanTargets[@]}" -eq 0 ]]; then
-        write-log "No files to scan with TruffleHog." info
+        write_log "No files to scan with TruffleHog." info
         exit 0
     fi
 
-    write-log "Running TruffleHog scan on ${#scanTargets[@]} file(s)..." info
+    write_log "Running TruffleHog scan on ${#scanTargets[@]} file(s)..." info
     for file in "${scanTargets[@]}"; do
-        write-log "Scanning: $file" info
+        write_log "Scanning: $file" info
         "$truffleCmd" filesystem "$file" --exclude "$excludeFile" || {
-            write-log "Potential secrets found in $file" warn
+            write_log "Potential secrets found in $file" warn
         }
     done
 
-    write-log "TruffleHog hook scan completed." success
+    write_log "TruffleHog hook scan completed." success
 }
-
-scan_with_trufflehog "$@"

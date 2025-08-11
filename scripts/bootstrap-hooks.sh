@@ -28,10 +28,10 @@ for hook in "${HOOKS[@]}"; do
     if [[ -f "$src_path" ]]; then
         cp "$src_path" "$tgt_path"
         chmod +x "$tgt_path"
-        write-stdlog "Installed $hook as ${tgt_path}" success
+        write_stdlog "Installed $hook as ${tgt_path}" info
     else
-        write-stdlog "Hook source not found: $src_path" warning
+        write_stdlog "Hook source not found: $src_path" warn
     fi
 done
 
-write-stdlog "All available hooks loaded." success
+write_stdlog "All available hooks loaded." success

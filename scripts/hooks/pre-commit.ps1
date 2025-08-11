@@ -12,18 +12,25 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 try {
-    Import-Module "$PWD/scripts/modules/shared-utils.psm1" -Force
+    Import-Module "$PWD/scripts/modules/SharedUtils.psm1" -Force
     $gitRoot = Resolve-RepoRoot
     Import-Module "$gitRoot/scripts/modules/TruffleHogHookScanner.psm1" -Force
+
+    # Ensure Docker is ready
+    if (-not (Test-DockerReady)) {
+        Write-Log "Docker is not running. Please start Docker Desktop or your Docker daemon." "warn"
+        exit 1
+    }
+
 } catch {
-    Write-StdLog "Failed to load TruffleHog scanner module: $_" -Type "error"
+    Write-Log "Failed to load TruffleHog scanner module: $_" -Type "error"
     exit 1
 }
 
 if (-not (Invoke-TruffleHogHookScan -HookType 'pre-commit')) {
-    Write-StdLog "Secret detected — blocking commit!" -Type "error"
+    Write-Log "Secret detected — blocking commit!" -Type "error"
     exit 1
 }
 
-Write-StdLog "TruffleHog scan passed — proceeding with commit." -Type "success"
+Write-Log "TruffleHog scan passed — proceeding with commit." -Type "success"
 exit 0

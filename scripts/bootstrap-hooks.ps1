@@ -14,7 +14,7 @@
 # figure out where the repo lives 
 $gitRoot = (& { git rev-parse --show-toplevel 2>$null }).Trim()
 $moduleBase = Join-Path $gitRoot "scripts/modules"
-$sharedUtilsPath = Join-Path $moduleBase "shared-utils.psm1"
+$sharedUtilsPath = Join-Path $moduleBase "SharedUtils.psm1"
 
 if (-not (Test-Path $sharedUtilsPath)) {
     Write-StdLog "Module file not found at path: $sharedUtilsPath", -Type "error"
