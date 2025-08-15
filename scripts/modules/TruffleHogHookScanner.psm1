@@ -35,9 +35,6 @@ function Invoke-TruffleHogScan {
         [string]$Image
     )
 
-Write-Log "Caller: $($MyInvocation.InvocationName)" -Type debug
-
-
     $tempFilePath = Join-Path -Path $PWD -ChildPath ("scan-" + [guid]::NewGuid().ToString() + ".tmp")
     Set-Content -Path $tempFilePath -Value $Content -Encoding UTF8
 
