@@ -59,6 +59,11 @@ Write-Log "Caller: $($MyInvocation.InvocationName)" -Type debug
             $scanResult = @{ IsClean = $false; RawOutput = $null }
             return  # optional early return; otherwise continue below
         } else {
+            if (-not $SourceDescription) {
+                Write-Log "Missing SourceDescription — defaulting to 'local-content'" -Type warn
+                $SourceDescription = "local-content"
+            }
+
             $RepoRoot = Resolve-RepoRoot
             $Image = Get-TruffleHogImage
             $dockerArgs = @(
