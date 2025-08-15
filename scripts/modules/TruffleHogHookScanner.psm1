@@ -35,7 +35,7 @@ function Invoke-TrufflehogScan {
     $tempFilePath = Join-Path -Path $PWD -ChildPath ("scan-" + [guid]::NewGuid().ToString() + ".tmp")
     Set-Content -Path $tempFilePath -Value $Content -Encoding UTF8
 
-    $scanResult = $null  # ← NEW: capture result here
+    $scanResult = $null  
 
     try {
         # Docker availability check
@@ -53,13 +53,13 @@ function Invoke-TrufflehogScan {
             $scanResult = @{ IsClean = $false; RawOutput = $null }
             return  # optional early return; otherwise continue below
         } else {
+            $RepoRoot = Resolve-RepoRoot
             $dockerArgs = @(
                 "run", "--rm",
-                "-v", "${PWD}:/pwd",
-                "--entrypoint", "trufflehog",
-                "ghcr.io/trufflesecurity/trufflehog:latest",
-                "filesystem", "/pwd/$([System.IO.Path]::GetFileName($tempFilePath)),"
-                "--json"
+                "--mount", "type=bind,source=$RepoRoot,target=/pwd",
+                "--workdir", "/pwd",
+                "trufflesecurity/trufflehog:latest",
+                "filesystem", "--path", "/pwd"
             )
 
             try {

@@ -230,14 +230,17 @@ function Test-HookEnvironment {
 
 function Test-DockerReady {
     $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
-    if (-not $dockerCmd) { return $false }
-
-    try {
-        docker info 2>$null | Out-Null
-        return $true
-    } catch {
+    if (-not $dockerCmd) {
         return $false
     }
+
+    $output = docker info 2>&1
+    if ($output -match "could not be found in this WSL 2 distro") {
+        Write-Log "Docker not integrated with WSL. Please enable WSL integration in Docker Desktop." "warn"
+        return $false
+    }
+
+    return $LASTEXITCODE -eq 0
 }
 
 function Test-DockerAvailable {
