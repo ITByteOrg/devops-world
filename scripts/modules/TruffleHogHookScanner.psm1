@@ -35,7 +35,6 @@ function Invoke-TruffleHogScan {
         [string]$Image
     )
 
-
 Write-Log "Caller: $($MyInvocation.InvocationName)" -Type debug
 
 
@@ -136,7 +135,7 @@ function Invoke-TruffleHogHookScan {
         return @{ IsClean = $true; RawOutput = $null }
     }
 
-    return Invoke-TrufflehogScan -Content $diffContent
+    return Invoke-TruffleHogScan -Content $diffContent
 }
 
 Export-ModuleMember -Function Invoke-TruffleHogHookScan, Get-GitDiffContent, Invoke-TruffleHogScan
