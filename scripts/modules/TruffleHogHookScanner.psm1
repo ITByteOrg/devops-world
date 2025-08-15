@@ -60,8 +60,7 @@ Write-Log "Caller: $($MyInvocation.InvocationName)" -Type debug
             return  # optional early return; otherwise continue below
         } else {
             if (-not $SourceDescription) {
-                Write-Log "Missing SourceDescription — defaulting to 'local-content'" -Type warn
-                $SourceDescription = "local-content"
+                $SourceDescription = if ($env:GIT_HOOK_TYPE) { $env:GIT_HOOK_TYPE } else { "local-content" }
             }
 
             $RepoRoot = Resolve-RepoRoot
