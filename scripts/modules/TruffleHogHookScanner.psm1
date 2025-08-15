@@ -31,7 +31,8 @@ function Get-GitDiffContent {
 
 function Invoke-TruffleHogScan {
     param (
-        [string]$Content
+        [string]$Content,
+        [string]$Image
     )
 
     $tempFilePath = Join-Path -Path $PWD -ChildPath ("scan-" + [guid]::NewGuid().ToString() + ".tmp")
@@ -56,12 +57,15 @@ function Invoke-TruffleHogScan {
             return  # optional early return; otherwise continue below
         } else {
             $RepoRoot = Resolve-RepoRoot
+            $Image = Get-TruffleHogImage
             $dockerArgs = @(
-                "run", "--rm",
-                "--mount", "type=bind,source=$RepoRoot,target=/pwd",
-                "--workdir", "/pwd",
-                "trufflesecurity/trufflehog:latest",
-                "filesystem", "--directory", "/pwd"
+                "run", "--rm", "-i",
+                "--network", "none",
+                $Image,
+                "--stdin",
+                "--only-verified",
+                "--json",
+                "--source-name", $SourceDescription
             )
 
             try {

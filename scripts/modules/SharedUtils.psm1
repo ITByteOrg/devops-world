@@ -17,6 +17,10 @@ function Get-CustomPrompt {
     return "$esc[32m$venv $esc[34m$cwd $esc[33m$branchText$esc[0m > "
 }
 
+function Get-TruffleHogImage {
+    return "ghcr.io/trufflesecurity/trufflehog:3.89.2"
+}
+
 function Write-Log {
     <#
     .SYNOPSIS
@@ -328,18 +332,15 @@ function Test-ToolReady {
     return $MissingTools
 }
 
-function Get-TruffleHogImage {
-    return "ghcr.io/trufflesecurity/trufflehog:3.89.2"
-}
-
 Export-ModuleMember -Function `
-    Resolve-RepoRoot, `
-    Resolve-ModulePath, `
-    Write-Log, `
-    Write-StdLog, `
-    Test-HookEnvironment, `
     Get-CustomPrompt, `
+    Get-TruffleHogImage, `
+    Resolve-ModulePath, `
+    Resolve-RepoRoot, `
     Test-DockerReady, `
     Test-HookContext, `
-    Get-TruffleHogImage
+    Test-HookEnvironment, `
+    Write-Log, `
+    Write-StdLog
+
      
