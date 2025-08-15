@@ -35,38 +35,38 @@ Write-StdLog "INFO" "Running commit-msg hook..."
 try {
     # Get latest commit hash
     $LatestCommit = & git rev-parse HEAD
-    Write-StdLog "INFO" "Latest commit: $LatestCommit"
+    Write-StdLog "Latest commit: $LatestCommit" "info"
 
     # Validate commit message format
     if (-not (Test-Path $CommitMsgFile)) {
-        Write-StdLog "ERROR" "Missing commit message file: $CommitMsgFile"
+        Write-StdLog "Missing commit message file: $CommitMsgFile" "error"
         exit 1
     }
 
     $CommitMessage = Get-Content $CommitMsgFile -Raw
-    Write-StdLog "INFO" "Commit message: `"$CommitMessage`""
+    Write-StdLog "Commit message: `"$CommitMessage`"" "info"
 
     if ($CommitMessage -notmatch '^[A-Z]') {
-        Write-StdLog "WARN" "Message should start with a capital letter."
+        Write-StdLog "Message should start with a capital letter." "warn"
     }
 
     # Run TruffleHog scan
-    Write-StdLog "INFO" "Scanning with TruffleHog..."
+    Write-StdLog "Scanning with TruffleHog..." "info"
     $TruffleResult = & trufflehog git --commit $LatestCommit 2>&1
 
     if ($TruffleResult -match 'Found \d+ results') {
-        Write-StdLog "ERROR" "TruffleHog detected possible secrets in the commit!"
-        Write-StdLog "ERROR" $TruffleResult
+        Write-StdLog "TruffleHog detected possible secrets in the commit!" "error"
+        Write-StdLog $TruffleResult "error"
         exit 1
     } else {
-        Write-StdLog "SUCCESS" "TruffleHog scan passed — no secrets detected."
+        Write-StdLog "TruffleHog scan passed — no secrets detected." "success"
     }
 
-    Write-StdLog "SUCCESS" "commit-msg hook completed."
+    Write-StdLog "commit-msg hook completed." "success"
     exit 0
 }
 catch {
-    Write-StdLog "FATAL" "Unhandled exception in commit-msg hook."
-    Write-StdLog "FATAL" $_
+    Write-StdLog "Unhandled exception in commit-msg hook." "error"
+    Write-StdLog $_ "error"
     exit 1
 }
