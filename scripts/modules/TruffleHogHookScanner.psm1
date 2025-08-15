@@ -3,8 +3,10 @@
   Executes a TruffleHog scan based on the Git hook type.
 
 .DESCRIPTION
-  Central entry point used by pre-commit, pre-push, and commit-msg hook wrappers.
-  Dynamically selects diff strategy, runs scan, and returns clean status.
+  Primary entry point for Git hook wrappers: pre-commit, pre-push, and commit-msg.
+  Dynamically selects the appropriate diff strategy, executes TruffleHog scan, and returns a clean status.
+  Manages repository context, exclusion rules, and scan orchestration.
+  Relies on shared utilities from TruffleHogShared.psm1.
 #>
 
 # modules are always Imported so $PSScriptRoot will resolve correctly
@@ -27,7 +29,7 @@ function Get-GitDiffContent {
     }
 }
 
-function Invoke-TrufflehogScan {
+function Invoke-TruffleHogScan {
     param (
         [string]$Content
     )
@@ -59,7 +61,7 @@ function Invoke-TrufflehogScan {
                 "--mount", "type=bind,source=$RepoRoot,target=/pwd",
                 "--workdir", "/pwd",
                 "trufflesecurity/trufflehog:latest",
-                "filesystem", "--path", "/pwd"
+                "filesystem", "--directory", "/pwd"
             )
 
             try {
@@ -129,4 +131,4 @@ function Invoke-TruffleHogHookScan {
     return Invoke-TrufflehogScan -Content $diffContent
 }
 
-Export-ModuleMember -Function Invoke-TrufflehogHookScan, Get-GitDiffContent, Invoke-TruffleHogScan
+Export-ModuleMember -Function Invoke-TruffleHogHookScan, Get-GitDiffContent, Invoke-TruffleHogScan

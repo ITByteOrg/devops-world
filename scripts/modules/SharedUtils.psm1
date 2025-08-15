@@ -7,6 +7,7 @@
   and emitting consistent log output. Used across Git hooks and automation scripts.
 #>
 
+
 function Get-CustomPrompt {
     $esc = "`e"
     $venv = if ($env:VIRTUAL_ENV) { "($([System.IO.Path]::GetFileName($env:VIRTUAL_ENV)))" } else { "" }
@@ -327,6 +328,10 @@ function Test-ToolReady {
     return $MissingTools
 }
 
+function Get-TruffleHogImage {
+    return "ghcr.io/trufflesecurity/trufflehog:3.89.2"
+}
+
 Export-ModuleMember -Function `
     Resolve-RepoRoot, `
     Resolve-ModulePath, `
@@ -335,5 +340,6 @@ Export-ModuleMember -Function `
     Test-HookEnvironment, `
     Get-CustomPrompt, `
     Test-DockerReady, `
-    Test-HookContext
-    
+    Test-HookContext, `
+    Get-TruffleHogImage
+     

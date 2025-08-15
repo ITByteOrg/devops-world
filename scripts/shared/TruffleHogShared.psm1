@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
     Shared helper functions for running TruffleHog secret scans.
+    Used by BOTH Powershell and Bash hooks
 
 .DESCRIPTION
     Encapsulates logic for:
@@ -11,7 +12,6 @@
 
 .EXPORTS
     Initialize-TruffleHogLogDir
-    Invoke-TrufflehogScan
     Test-FileHasMeaningfulContent
 
 .NOTES
@@ -80,7 +80,6 @@ function Get-GitDiffContent {
     }
 }
 
-
 function Test-FileHasMeaningfulContent {
     param (
         [string]$FilePath
@@ -92,46 +91,6 @@ function Test-FileHasMeaningfulContent {
 
     $content = Get-Content $FilePath -Raw -ErrorAction SilentlyContinue
     return ($content -match '\S')
-}
-
-function Invoke-TruffleHogScan {
-    param (
-        [string]$Content,
-        [string]$SourceDescription,
-        [string]$LogDir,
-        [string[]]$ExcludeDetectors = @()
-    )
-
-    $dockerArgs = @(
-        "run", "--rm", "-i",
-        "--network", "none",
-        "trufflesecurity/trufflehog:latest",
-        "stdin",
-        "--only-verified",
-        "--json",
-        "--source-name", $SourceDescription
-    )
-
-    foreach ($detector in $ExcludeDetectors) {
-        $dockerArgs += @("--exclude-detectors", $detector)
-    }
-
-    try {
-        $result = $Content | docker @dockerArgs 2>&1
-        $hasSecrets = $result -match '"verified":\s*true'
-        return @{
-            HasSecrets = $hasSecrets
-            HasError = $false
-            Raw = $result
-        }
-    } catch {
-        Write-Log -Message ("Scan failed for {0}. Error: {1}" -f $SourceDescription, $_) -Type "error"
-        return @{
-            HasSecrets = $false
-            HasError = $true
-            Raw = $_.Exception.Message
-        }
-    }
 }
 
 function Test-BinFilesForCRLF {
@@ -158,6 +117,5 @@ function Test-BinFilesForCRLF {
 
 Export-ModuleMember `
     -Function Initialize-TruffleHogLogDir, `
-              Invoke-TruffleHogScan, `
               Test-FileHasMeaningfulContent, `
               Get-GitDiffContent
