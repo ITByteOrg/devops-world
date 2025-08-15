@@ -71,8 +71,7 @@ Write-Log "Caller: $($MyInvocation.InvocationName)" -Type debug
                 $Image,
                 "stdin",
                 "--only-verified",
-                "--json",
-                "--source-name", $SourceDescription
+                "--json"
             )
 
             try {
