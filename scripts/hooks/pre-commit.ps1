@@ -14,7 +14,6 @@ Set-StrictMode -Version Latest
 try {
     Import-Module "$PWD/scripts/modules/SharedUtils.psm1" -Force
     $gitRoot = Resolve-RepoRoot
-    Import-Module "$gitRoot/scripts/modules/TruffleHogHookScanner.psm1" -Force
 
     # Ensure Docker is ready
     if (-not (Test-DockerReady)) {
@@ -22,6 +21,7 @@ try {
         exit 1
     }
 
+    Import-Module "$gitRoot/scripts/modules/TruffleHogHookScanner.psm1" -Force
 } catch {
     Write-Log "Failed to load TruffleHog scanner module: $_" -Type "error"
     exit 1

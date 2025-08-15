@@ -7,6 +7,7 @@
   and emitting consistent log output. Used across Git hooks and automation scripts.
 #>
 
+
 function Get-CustomPrompt {
     $esc = "`e"
     $venv = if ($env:VIRTUAL_ENV) { "($([System.IO.Path]::GetFileName($env:VIRTUAL_ENV)))" } else { "" }
@@ -14,6 +15,10 @@ function Get-CustomPrompt {
     $branchText = if ($gitBranch) { "[$gitBranch]" } else { "" }
     $cwd = Get-Location
     return "$esc[32m$venv $esc[34m$cwd $esc[33m$branchText$esc[0m > "
+}
+
+function Get-TruffleHogImage {
+    return "ghcr.io/trufflesecurity/trufflehog:3.89.2"
 }
 
 function Write-Log {
@@ -230,14 +235,17 @@ function Test-HookEnvironment {
 
 function Test-DockerReady {
     $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
-    if (-not $dockerCmd) { return $false }
-
-    try {
-        docker info 2>$null | Out-Null
-        return $true
-    } catch {
+    if (-not $dockerCmd) {
         return $false
     }
+
+    $output = docker info 2>&1
+    if ($output -match "could not be found in this WSL 2 distro") {
+        Write-Log "Docker not integrated with WSL. Please enable WSL integration in Docker Desktop." "warn"
+        return $false
+    }
+
+    return $LASTEXITCODE -eq 0
 }
 
 function Test-DockerAvailable {
@@ -325,12 +333,14 @@ function Test-ToolReady {
 }
 
 Export-ModuleMember -Function `
-    Resolve-RepoRoot, `
-    Resolve-ModulePath, `
-    Write-Log, `
-    Write-StdLog, `
-    Test-HookEnvironment, `
     Get-CustomPrompt, `
+    Get-TruffleHogImage, `
+    Resolve-ModulePath, `
+    Resolve-RepoRoot, `
     Test-DockerReady, `
-    Test-HookContext
-    
+    Test-HookContext, `
+    Test-HookEnvironment, `
+    Write-Log, `
+    Write-StdLog
+
+     

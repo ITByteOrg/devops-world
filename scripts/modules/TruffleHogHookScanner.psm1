@@ -3,8 +3,10 @@
   Executes a TruffleHog scan based on the Git hook type.
 
 .DESCRIPTION
-  Central entry point used by pre-commit, pre-push, and commit-msg hook wrappers.
-  Dynamically selects diff strategy, runs scan, and returns clean status.
+  Primary entry point for Git hook wrappers: pre-commit, pre-push, and commit-msg.
+  Dynamically selects the appropriate diff strategy, executes TruffleHog scan, and returns a clean status.
+  Manages repository context, exclusion rules, and scan orchestration.
+  Relies on shared utilities from TruffleHogShared.psm1.
 #>
 
 # modules are always Imported so $PSScriptRoot will resolve correctly
@@ -27,15 +29,16 @@ function Get-GitDiffContent {
     }
 }
 
-function Invoke-TrufflehogScan {
+function Invoke-TruffleHogScan {
     param (
-        [string]$Content
+        [string]$Content,
+        [string]$Image
     )
 
     $tempFilePath = Join-Path -Path $PWD -ChildPath ("scan-" + [guid]::NewGuid().ToString() + ".tmp")
     Set-Content -Path $tempFilePath -Value $Content -Encoding UTF8
 
-    $scanResult = $null  # ← NEW: capture result here
+    $scanResult = $null  
 
     try {
         # Docker availability check
@@ -53,12 +56,18 @@ function Invoke-TrufflehogScan {
             $scanResult = @{ IsClean = $false; RawOutput = $null }
             return  # optional early return; otherwise continue below
         } else {
+            if (-not $SourceDescription) {
+                $SourceDescription = if ($env:GIT_HOOK_TYPE) { $env:GIT_HOOK_TYPE } else { "local-content" }
+            }
+
+            $RepoRoot = Resolve-RepoRoot
+            $Image = Get-TruffleHogImage
             $dockerArgs = @(
-                "run", "--rm",
-                "-v", "${PWD}:/pwd",
-                "--entrypoint", "trufflehog",
-                "ghcr.io/trufflesecurity/trufflehog:latest",
-                "filesystem", "/pwd/$([System.IO.Path]::GetFileName($tempFilePath)),"
+                "run", "--rm", "-i",
+                "--network", "none",
+                $Image,
+                "stdin",
+                "--only-verified",
                 "--json"
             )
 
@@ -126,7 +135,7 @@ function Invoke-TruffleHogHookScan {
         return @{ IsClean = $true; RawOutput = $null }
     }
 
-    return Invoke-TrufflehogScan -Content $diffContent
+    return Invoke-TruffleHogScan -Content $diffContent
 }
 
-Export-ModuleMember -Function Invoke-TrufflehogHookScan, Get-GitDiffContent, Invoke-TruffleHogScan
+Export-ModuleMember -Function Invoke-TruffleHogHookScan, Get-GitDiffContent, Invoke-TruffleHogScan

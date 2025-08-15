@@ -22,6 +22,8 @@ if (Test-Path $SharedUtilsPath) {
 
         # Dispatcher call
         $Status = Test-HookContext -RepoRoot $RepoRoot -VerboseMode $VerboseMode
+        $OldBranch = git name-rev --name-only $args[0]
+        $NewBranch = git name-rev --name-only $args[1]
 
         # Conditional logic based on results
         if ($Status.EnvMissing -contains "Docker (not running)") {
@@ -40,7 +42,7 @@ if (Test-Path $SharedUtilsPath) {
 }
 
 if (Get-Command Write-StdLog -ErrorAction SilentlyContinue) {
-    Write-Log "Post-checkout hook triggered — branch switch detected" -Type "info"
+    Write-Log "Checked out from $OldBranch to $NewBranch" -Type "info"
 } else {
     Write-Host "[WARN] Write-Log not available—skipping structured logging"
 }
