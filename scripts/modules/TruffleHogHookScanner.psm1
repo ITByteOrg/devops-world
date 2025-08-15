@@ -62,7 +62,7 @@ function Invoke-TruffleHogScan {
                 "run", "--rm", "-i",
                 "--network", "none",
                 $Image,
-                "--stdin",
+                "stdin",
                 "--only-verified",
                 "--json",
                 "--source-name", $SourceDescription
